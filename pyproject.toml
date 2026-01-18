@@ -1,0 +1,57 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel", "cython>=3.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "goblin-ai"
+version = "1.0.0"
+description = "Free AI Image Generation - 34 Models, unlimited, no API key needed"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.11"
+authors = [
+    {name = "Goblin Team"}
+]
+keywords = ["ai", "image-generation", "stable-diffusion", "flux", "anime", "api", "free"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Multimedia :: Graphics",
+]
+dependencies = [
+    "cloudscraper>=1.2.71",
+    "fastapi>=0.100.0",
+    "uvicorn>=0.23.0",
+    "pydantic>=2.0.0",
+]
+
+[project.scripts]
+goblin = "goblin.__main__:main"
+
+[project.urls]
+Homepage = "https://github.com/mdakk072/goblin-ai"
+
+[tool.setuptools]
+packages = ["goblin"]
+include-package-data = true
+
+[tool.setuptools.package-data]
+goblin = ["*.pyd", "*.so"]
+
+[tool.cibuildwheel]
+build = "cp311-* cp312-* cp313-*"
+skip = "*-musllinux* *-win32 *-manylinux_i686"
+
+[tool.cibuildwheel.linux]
+before-build = "pip install cython setuptools"
+
+[tool.cibuildwheel.windows]
+before-build = "pip install cython setuptools"
+
+[tool.cibuildwheel.macos]
+before-build = "pip install cython setuptools"
