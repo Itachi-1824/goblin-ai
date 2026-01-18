@@ -17,10 +17,7 @@ async def test():
             print(f"Browser closed: {g._browser_closed}")
             print(f"Using curl_cffi with Firefox impersonation")
 
-            # Wait for previous browser request to finish
-            # (the browser triggers a generation during key capture)
-            print("Waiting for previous browser request to complete...")
-            await asyncio.sleep(10)
+            # No wait needed - optimized to not trigger browser generation
 
             # Generate image (browserless - using curl_cffi)
             print("Generating image (browserless mode)...")
