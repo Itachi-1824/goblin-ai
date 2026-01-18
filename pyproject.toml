@@ -7,7 +7,7 @@ name = "goblin-ai"
 version = "1.0.0"
 description = "Free AI Image Generation - 34 Models, unlimited, no API key needed"
 readme = "README.md"
-license = "Proprietary"
+license = {text = "Proprietary"}
 requires-python = ">=3.11"
 authors = [
     {name = "Goblin Team"}
