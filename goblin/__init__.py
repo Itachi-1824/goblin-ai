@@ -1,6 +1,6 @@
 """
 Goblin - Free AI Image Generation
-34 Models including Stable Diffusion, Flux, Anime, Realistic, and more!
+50+ Models including Stable Diffusion, Flux, SDXL, Anime, Realistic, and more!
 """
 # Runtime protection
 from . import _guard
@@ -14,8 +14,14 @@ from .parameters import (
     build_prompt, get_style, get_quality, get_lighting, get_camera,
     get_composition, get_expression, get_resolution
 )
+from .prompts import (
+    random_prompt, enhance_prompt, enhance_for_model,
+    random_character_prompt, random_landscape_prompt, random_anime_prompt,
+    create_variations, list_categories, list_art_styles, list_environments,
+    list_model_types
+)
 
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 __all__ = [
     # Main class
     "Goblin",
@@ -51,4 +57,17 @@ __all__ = [
     "get_composition",
     "get_expression",
     "get_resolution",
+
+    # Prompt Tools (NEW)
+    "random_prompt",
+    "enhance_prompt",
+    "enhance_for_model",
+    "random_character_prompt",
+    "random_landscape_prompt",
+    "random_anime_prompt",
+    "create_variations",
+    "list_categories",
+    "list_art_styles",
+    "list_environments",
+    "list_model_types",
 ]
