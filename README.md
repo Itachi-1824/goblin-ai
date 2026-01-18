@@ -130,4 +130,12 @@ await g.generate(
 
 ## License
 
-MIT
+Proprietary - All Rights Reserved
+
+This software is provided for personal use only. You may NOT:
+- Copy, modify, or distribute this software
+- Reverse engineer or decompile the code
+- Use this software for commercial purposes without permission
+- Redistribute in any form
+
+© 2026 Goblin Team
