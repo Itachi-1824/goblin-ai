@@ -5,7 +5,7 @@ Free AI Image Generation with 34 Models. No API key. No limits. Just vibes.
 ## Installation
 
 ```bash
-pip install goblin
+pip install goblin-ai
 ```
 
 ## Quick Start
