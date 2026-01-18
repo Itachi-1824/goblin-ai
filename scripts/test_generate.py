@@ -2,13 +2,14 @@
 """Test script for goblin-ai image generation"""
 import asyncio
 import os
+import platform
 from goblin import Goblin
 from datetime import datetime
 
 
 async def test():
     print("Starting test...")
-    print(f"Python running on: {os.uname()}")
+    print(f"Platform: {platform.system()} {platform.release()}")
 
     try:
         async with Goblin() as g:

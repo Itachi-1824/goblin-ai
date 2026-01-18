@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "goblin-ai"
-version = "1.0.9"
-description = "Free AI Image Generation - 34 Models, unlimited, no API key needed"
+version = "1.1.0"
+description = "Free AI Image Generation - 34 Models, unlimited, no API key needed, works on any IP"
 readme = "README.md"
 license = {text = "Proprietary"}
 requires-python = ">=3.11"
@@ -24,7 +24,6 @@ classifiers = [
     "Topic :: Multimedia :: Graphics",
 ]
 dependencies = [
-    "curl_cffi>=0.5.0",
     "fastapi>=0.100.0",
     "uvicorn>=0.23.0",
     "pydantic>=2.0.0",
