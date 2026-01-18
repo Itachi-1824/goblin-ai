@@ -34,37 +34,31 @@ jobs:
           CIBW_BUILD_VERBOSITY: 1
 
       - name: Remove source files from wheels
-        shell: bash
+        shell: python
         run: |
-          cd wheelhouse
-          for whl in *.whl; do
-            mkdir tmp && cd tmp
-            unzip ../$whl
-            rm -f goblin/*.py goblin/*.c
-            # Keep only __init__.py and __main__.py
-            echo '"""Goblin - Free AI Image Generation"""
-from .generator import Goblin, GenerateRequest
-from .server import create_app, run_server
-from .models import MODELS, CATEGORIES, list_models, get_model, get_model_styles, get_model_params, get_model_defaults
-from .parameters import STYLES, QUALITY_PRESETS, LIGHTING_PRESETS, CAMERA_PRESETS, COMPOSITION_PRESETS, EXPRESSION_PRESETS, RESOLUTIONS, AVAILABLE_OPTIONS, build_prompt, get_style, get_quality, get_lighting, get_camera, get_composition, get_expression, get_resolution
-__version__ = "1.0.1"
-__all__ = ["Goblin", "GenerateRequest", "create_app", "run_server", "MODELS", "CATEGORIES", "list_models", "get_model", "get_model_styles", "get_model_params", "get_model_defaults", "STYLES", "QUALITY_PRESETS", "LIGHTING_PRESETS", "CAMERA_PRESETS", "COMPOSITION_PRESETS", "EXPRESSION_PRESETS", "RESOLUTIONS", "AVAILABLE_OPTIONS", "build_prompt", "get_style", "get_quality", "get_lighting", "get_camera", "get_composition", "get_expression", "get_resolution"]' > goblin/__init__.py
-            echo '"""Goblin CLI"""
-import argparse
-def main():
-    parser = argparse.ArgumentParser(description="Goblin - Free AI Image Generation")
-    parser.add_argument("--host", default="0.0.0.0", help="Host to bind to")
-    parser.add_argument("--port", type=int, default=8000, help="Port to bind to")
-    parser.add_argument("--static", help="Path to static files directory")
-    args = parser.parse_args()
-    from .server import run_server
-    run_server(host=args.host, port=args.port, static_dir=args.static)
-if __name__ == "__main__":
-    main()' > goblin/__main__.py
-            rm ../$whl
-            zip -r ../$whl *
-            cd .. && rm -rf tmp
-          done
+          import os, zipfile, shutil
+          for whl in os.listdir('wheelhouse'):
+            if not whl.endswith('.whl'): continue
+            whl_path = os.path.join('wheelhouse', whl)
+            tmp = 'tmp_whl'
+            os.makedirs(tmp, exist_ok=True)
+            with zipfile.ZipFile(whl_path, 'r') as z: z.extractall(tmp)
+            gdir = os.path.join(tmp, 'goblin')
+            for f in os.listdir(gdir):
+              if f.endswith('.py') or f.endswith('.c'):
+                os.remove(os.path.join(gdir, f))
+            with open(os.path.join(gdir, '__init__.py'), 'w') as f:
+              f.write('"""Goblin - Free AI Image Generation"""\nfrom .generator import Goblin, GenerateRequest\nfrom .server import create_app, run_server\nfrom .models import MODELS, CATEGORIES, list_models, get_model, get_model_styles, get_model_params, get_model_defaults\nfrom .parameters import STYLES, QUALITY_PRESETS, LIGHTING_PRESETS, CAMERA_PRESETS, COMPOSITION_PRESETS, EXPRESSION_PRESETS, RESOLUTIONS, AVAILABLE_OPTIONS\n__version__ = "1.0.0"\n')
+            with open(os.path.join(gdir, '__main__.py'), 'w') as f:
+              f.write('import argparse\ndef main():\n    parser = argparse.ArgumentParser(description="Goblin")\n    parser.add_argument("--host", default="0.0.0.0")\n    parser.add_argument("--port", type=int, default=8000)\n    parser.add_argument("--static")\n    args = parser.parse_args()\n    from .server import run_server\n    run_server(host=args.host, port=args.port, static_dir=args.static)\nif __name__ == "__main__": main()\n')
+            os.remove(whl_path)
+            with zipfile.ZipFile(whl_path, 'w', zipfile.ZIP_DEFLATED) as z:
+              for root, dirs, files in os.walk(tmp):
+                for file in files:
+                  fp = os.path.join(root, file)
+                  z.write(fp, os.path.relpath(fp, tmp))
+            shutil.rmtree(tmp)
+            print(f'Cleaned {whl}')
 
       - uses: actions/upload-artifact@v4
         with:
