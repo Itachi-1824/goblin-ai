@@ -1,4 +1,4 @@
-name: Publish Wheels to PyPI
+name: Build & Publish to PyPI
 
 on:
   push:
@@ -7,9 +7,19 @@ on:
   workflow_dispatch:
 
 jobs:
-  publish:
-    name: Upload to PyPI
-    runs-on: ubuntu-latest
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            platform: manylinux
+          - os: macos-latest
+            platform: macos
+          - os: windows-latest
+            platform: windows
+
+    runs-on: ${{ matrix.os }}
+    name: Build ${{ matrix.platform }}
 
     steps:
       - uses: actions/checkout@v4
@@ -19,11 +29,107 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Install twine
-        run: pip install twine
+      - name: Install build tools
+        run: pip install nuitka ordered-set zstandard wheel setuptools
+
+      - name: Decrypt source files (Unix)
+        if: runner.os != 'Windows'
+        env:
+          SOURCE_1: ${{ secrets.GOBLIN_SOURCE_1 }}
+          SOURCE_2: ${{ secrets.GOBLIN_SOURCE_2 }}
+        run: |
+          echo "${SOURCE_1}${SOURCE_2}" | base64 -d | xz -d > source.tar
+          tar -xf source.tar -C goblin/
+          rm source.tar
+          ls -la goblin/*.py
+
+      - name: Decrypt source files (Windows)
+        if: runner.os == 'Windows'
+        env:
+          SOURCE_1: ${{ secrets.GOBLIN_SOURCE_1 }}
+          SOURCE_2: ${{ secrets.GOBLIN_SOURCE_2 }}
+        shell: python
+        run: |
+          import base64, lzma, tarfile, io, os
+          s1 = os.environ['SOURCE_1']
+          s2 = os.environ['SOURCE_2']
+          data = base64.b64decode(s1 + s2)
+          data = lzma.decompress(data)
+          tar = tarfile.open(fileobj=io.BytesIO(data))
+          tar.extractall('goblin')
+          tar.close()
+          for f in os.listdir('goblin'):
+            if f.endswith('.py'):
+              print(f'Extracted: {f}')
+
+      - name: Compile with Nuitka (Unix)
+        if: runner.os != 'Windows'
+        run: |
+          for module in _core _guard easy generator models parameters server prompts; do
+            echo "Compiling $module..."
+            python -m nuitka --module goblin/${module}.py --output-dir=goblin --remove-output
+          done
+
+      - name: Compile with Nuitka (Windows)
+        if: runner.os == 'Windows'
+        shell: cmd
+        run: |
+          for %%m in (_core _guard easy generator models parameters server prompts) do (
+            echo Compiling %%m...
+            python -m nuitka --module goblin/%%m.py --output-dir=goblin --remove-output
+          )
+
+      - name: Remove source files
+        shell: python
+        run: |
+          import os
+          for f in ['_core.py', '_guard.py', 'easy.py', 'generator.py', 'models.py', 'parameters.py', 'server.py', 'prompts.py']:
+            path = os.path.join('goblin', f)
+            if os.path.exists(path):
+              os.remove(path)
+              print(f'Removed: {f}')
+          for f in os.listdir('goblin'):
+            if f.endswith('.pyi'):
+              os.remove(os.path.join('goblin', f))
+
+      - name: List compiled files
+        shell: python
+        run: |
+          import os
+          for f in sorted(os.listdir('goblin')):
+            print(f)
+
+      - name: Build wheel
+        run: pip wheel . --no-deps -w dist/
+
+      - name: Upload wheel
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheel-${{ matrix.platform }}
+          path: dist/*.whl
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    name: Publish to PyPI
+
+    steps:
+      - name: Download all wheels
+        uses: actions/download-artifact@v4
+        with:
+          path: dist/
+          merge-multiple: true
 
       - name: List wheels
         run: ls -la dist/
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install twine
+        run: pip install twine
 
       - name: Publish to PyPI
         env:
