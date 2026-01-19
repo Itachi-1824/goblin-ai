@@ -9,13 +9,12 @@ wheelhouse/
 *.c
 
 # Source files (NEVER commit these - compiled binaries only!)
-goblin/_core.py
-goblin/_guard.py
-goblin/easy.py
-goblin/generator.py
-goblin/models.py
-goblin/parameters.py
-goblin/server.py
+# Block ALL .py files in goblin/ by default
+goblin/*.py
+
+# Allow only loader files (no sensitive data)
+!goblin/__init__.py
+!goblin/__main__.py
 
 # Python
 __pycache__/

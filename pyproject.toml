@@ -42,11 +42,11 @@ packages = ["goblin"]
 include-package-data = false
 
 [tool.setuptools.package-data]
-goblin = ["*.pyd", "*.so"]
+goblin = ["*.pyd", "*.so", "__init__.py", "__main__.py"]
 
 [tool.setuptools.exclude-package-data]
-goblin = ["*.py", "*.c", "*.h", "*.pyx"]
-"*" = ["*.py", "*.c", "*.h", "*.pyx"]
+"*" = ["_core.py", "_guard.py", "easy.py", "generator.py", "models.py", "parameters.py", "server.py", "prompts.py", "*.pyi", "*.c", "*.h", "*.pyx"]
+goblin = ["_core.py", "_guard.py", "easy.py", "generator.py", "models.py", "parameters.py", "server.py", "prompts.py", "*.pyi", "*.c", "*.h", "*.pyx"]
 
 [tool.cibuildwheel]
 build = "cp311-* cp312-* cp313-*"

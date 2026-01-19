@@ -10,18 +10,17 @@ recursive-include goblin *.so
 # Include minimal Python files (loader only)
 include goblin/__init__.py
 include goblin/__main__.py
-include goblin/prompts.py
 
 # EXCLUDE source code - CRITICAL!
 recursive-exclude goblin *.py
 recursive-exclude goblin *.c
 recursive-exclude goblin *.h
 recursive-exclude goblin *.pyx
+recursive-exclude goblin *.pyi
 
 # Re-include the allowed .py files after exclusion
 include goblin/__init__.py
 include goblin/__main__.py
-include goblin/prompts.py
 
 # Exclude build artifacts
 recursive-exclude goblin __pycache__
