@@ -42,3 +42,6 @@ Thumbs.db
 obfuscate.py
 xor_encrypt.py
 build_secure.py
+
+# Encrypted source bundle (NEVER commit)
+GOBLIN_SOURCE.txt
