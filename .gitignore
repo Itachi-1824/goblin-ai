@@ -45,3 +45,5 @@ build_secure.py
 
 # Encrypted source bundle (NEVER commit)
 GOBLIN_SOURCE.txt
+GOBLIN_SOURCE_1.txt
+GOBLIN_SOURCE_2.txt

@@ -34,11 +34,12 @@ jobs:
 
       - name: Decrypt source files
         env:
-          ENCRYPTED_SOURCE: ${{ secrets.GOBLIN_SOURCE }}
+          SOURCE_1: ${{ secrets.GOBLIN_SOURCE_1 }}
+          SOURCE_2: ${{ secrets.GOBLIN_SOURCE_2 }}
         run: |
-          echo "$ENCRYPTED_SOURCE" | base64 -d > source.tar.gz
-          tar -xzf source.tar.gz -C goblin/
-          rm source.tar.gz
+          echo "${SOURCE_1}${SOURCE_2}" | base64 -d | xz -d > source.tar
+          tar -xf source.tar -C goblin/
+          rm source.tar
           ls -la goblin/*.py
 
       - name: Compile with Nuitka
