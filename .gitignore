@@ -4,8 +4,9 @@ dist/
 *.egg-info/
 wheelhouse/
 
-# Compiled files (except goblin binaries)
+# Compiled files (CI builds these)
 *.so
+*.pyd
 *.c
 
 # Source files (NEVER commit these - compiled binaries only!)
