@@ -1,10 +1,20 @@
 """
 Goblin - Free AI Image Generation
-50+ Models including Stable Diffusion, Flux, SDXL, Anime, Realistic, and more!
+50 Models. No API key. No sign-up. Just generate.
+
+Simple usage:
+    from goblin import generate
+    image = await generate("a beautiful sunset")
+
+That's it. We handle model selection, optimal settings, everything.
 """
 # Runtime protection
 from . import _guard
 
+# Simple API (recommended)
+from .easy import generate, generate_batch, detect_model, close
+
+# Advanced API
 from .generator import Goblin, GenerateRequest
 from .server import create_app, run_server
 from .models import MODELS, CATEGORIES, list_models, get_model, get_model_styles, get_model_params, get_model_defaults
@@ -23,7 +33,13 @@ from .prompts import (
 
 __version__ = "1.1.0"
 __all__ = [
-    # Main class
+    # Simple API (recommended)
+    "generate",
+    "generate_batch",
+    "detect_model",
+    "close",
+
+    # Advanced API
     "Goblin",
     "GenerateRequest",
 
@@ -58,7 +74,7 @@ __all__ = [
     "get_expression",
     "get_resolution",
 
-    # Prompt Tools (NEW)
+    # Prompt Tools
     "random_prompt",
     "enhance_prompt",
     "enhance_for_model",

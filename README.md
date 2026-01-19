@@ -1,6 +1,6 @@
-# Goblin
+# Goblin AI
 
-Free AI Image Generation with 34 Models. No API key. No limits. Just vibes.
+Unlimited free AI image generation. No sign-up required.
 
 ## Installation
 
@@ -10,132 +10,127 @@ pip install goblin-ai
 
 ## Quick Start
 
-### Python API
-
 ```python
 import asyncio
-from goblin import Goblin
+from goblin import generate
 
 async def main():
-    async with Goblin() as g:
-        # Generate an image
-        image_bytes = await g.generate("a beautiful sunset over mountains")
+    # One-liner generation - model auto-selected based on prompt
+    await generate("a cute anime girl", output="anime.png")
 
-        # Save it
-        with open("sunset.jpg", "wb") as f:
-            f.write(image_bytes)
+    # Realistic portrait - auto-detects from keywords
+    await generate("professional headshot, studio lighting", output="portrait.png")
 
-        # Use different models
-        anime_img = await g.generate("cute anime girl", model="goblin-anime")
-        realistic_img = await g.generate("professional headshot", model="goblin-portrait")
-
-        # With style parameters
-        cinematic = await g.generate(
-            "epic dragon battle",
-            model="goblin-fantasy",
-            style="cinematic",
-            quality="ultra",
-            lighting="dramatic"
-        )
+    # Specify model explicitly
+    await generate("epic dragon", model="goblin-fantasy", output="dragon.png")
 
 asyncio.run(main())
 ```
 
-### Run as Server
+## Simple API
 
-```bash
-# Command line
-goblin --port 8000
+```python
+from goblin import generate, detect_model
 
-# Or in Python
-from goblin import run_server
-run_server(port=8000)
+# Auto model selection
+model = detect_model("1girl anime")  # Returns "goblin-anime"
+
+# Generate with full control
+image = await generate(
+    prompt="beautiful sunset",
+    model="goblin-landscape",
+    quality="ultra",
+    width=1024,
+    height=768
+)
 ```
 
-### API Endpoints
+## Advanced Usage
 
-- `GET /health` - Health check
-- `GET /models` - List all 34 models
-- `GET /options` - All available style/lighting/camera options
-- `POST /generate` - Generate image (returns JPEG)
-- `POST /generate/base64` - Generate image (returns base64 JSON)
+```python
+from goblin import Goblin
 
-## Available Models (34 Total)
+async with Goblin() as g:
+    # Full parameter control
+    image = await g.generate(
+        prompt="cyberpunk city",
+        model="goblin-cyberpunk",
+        style="neon",
+        quality="ultra",
+        lighting="dramatic",
+        guidance_scale=7.0
+    )
+```
+
+## Run as Server
+
+```bash
+goblin --port 8000
+```
+
+## Model Categories
 
 ### General Purpose
-- `goblin-sd` - Flagship Stable Diffusion
-- `goblin-sd-v2` - SD V2 improved
+- `goblin-sd` - Versatile all-rounder
 - `goblin-pro` - Professional grade
 
-### Flux Models (12B)
-- `goblin-flux` - Flux.1 Schnell
-- `goblin-flux-dev` - Development
-- `goblin-flux-pro` - Enhanced
-- `goblin-laia` - LAIA model
-- `goblin-laia-pro` - LAIA Pro
+### Advanced Models
+- `goblin-flux` - Best text rendering
+- `goblin-flux-pro` - Enhanced quality
+- `goblin-sdxl` - High resolution
 
-### Anime
-- `goblin-anime` - Classic anime
-- `goblin-anime-xl` - Advanced
-- `goblin-anime-v2` - V2 improved
-- `goblin-anime-character` - Character focused
+### Anime & Manga
+- `goblin-anime` - Classic anime style
+- `goblin-anime-xl` - Advanced anime
+- `goblin-chibi` - Kawaii/chibi style
 
-### Realistic
+### Photography
 - `goblin-realistic` - Photorealistic
-- `goblin-photo` - Camera quality
-- `goblin-portrait` - Portraits
-- `goblin-portrait-v2` - Portraits V2
+- `goblin-portrait` - Portrait photos
 - `goblin-portrait-hd` - HD portraits
-- `goblin-human` - Full body
-- `goblin-portrait-pro` - Professional
+- `goblin-photo` - Camera quality
 
 ### Art Styles
 - `goblin-digital` - Digital art
 - `goblin-concept` - Concept art
-- `goblin-fantasy` - Fantasy
-- `goblin-cyberpunk` - Cyberpunk
+- `goblin-fantasy` - Fantasy scenes
+- `goblin-cyberpunk` - Cyberpunk aesthetic
 - `goblin-pixel` - Pixel art
-- `goblin-oil` - Oil painting
-- `goblin-creative` - Creative AI
+- `goblin-oil` - Oil painting style
+
+### Landscapes
+- `goblin-landscape` - Nature scenes
+- `goblin-background` - Wallpapers
+
+### Game Assets
+- `goblin-icon` - App/game icons
+- `goblin-sprite` - 2D sprites
+- `goblin-pokemon` - Creature design
+
+### Character
 - `goblin-character` - Character design
-
-### NSFW (18+)
-- `goblin-uncensored` - Realistic
-- `goblin-uncensored-v2` - V2
-- `goblin-uncensored-v3` - V3
-- `goblin-anime-uncensored` - Anime
-
-### Furry
 - `goblin-furry` - Furry art
-- `goblin-furry-v2` - V2
-- `goblin-fursona` - Fursona creator
+
+### Adult (18+)
+- `goblin-uncensored` - Realistic
+- `goblin-anime-uncensored` - Anime style
 
 ## Parameters
 
-```python
-await g.generate(
-    prompt="your prompt",
-    model="goblin-sd",           # 34 models available
-    style="cinematic",           # 21 style presets
-    quality="ultra",             # standard, high, ultra, maximum
-    lighting="golden-hour",      # 11 lighting presets
-    camera="portrait-85mm",      # 8 camera presets
-    composition="closeup",       # 9 composition options
-    expression="happy",          # 10 expression presets
-    shape="portrait",            # square, portrait, landscape
-    seed=-1,                     # -1 for random
-    guidance_scale=7.0,          # 1-30
-)
-```
+| Parameter | Description | Default |
+|-----------|-------------|---------|
+| `prompt` | What to generate | Required |
+| `model` | Model ID | Auto-detected |
+| `quality` | standard/high/ultra/maximum | ultra |
+| `style` | Style preset | default |
+| `lighting` | Lighting preset | auto |
+| `width` | Image width | 768 |
+| `height` | Image height | 768 |
+| `seed` | Random seed (-1 for random) | -1 |
+| `guidance_scale` | Prompt adherence (1-30) | Model default |
 
 ## License
 
-Proprietary - All Rights Reserved
-
-This software is provided for personal use only. You may NOT:
-- Copy, modify, or distribute this software
-- Reverse engineer or decompile the code
-- Use this software for commercial purposes without permission
-- Redistribute in any form
+Proprietary - Personal use only
 
 © 2026 Goblin Team
