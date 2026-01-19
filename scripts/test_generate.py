@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Test script for goblin-ai image generation - BROWSERLESS MODE"""
+"""Test script for goblin-ai image generation"""
 import asyncio
 import os
 import platform
@@ -14,13 +14,10 @@ async def test():
     try:
         async with Goblin() as g:
             print(f"Key obtained: {g._k[:20]}...")
-            print(f"Browser closed: {g._browser_closed}")
-            print(f"Using curl_cffi with Firefox impersonation")
+            print("Session ready!")
 
-            # No wait needed - optimized to not trigger browser generation
-
-            # Generate image (browserless - using curl_cffi)
-            print("Generating image (browserless mode)...")
+            # Generate image
+            print("Generating image...")
             img_bytes = await g.generate("a beautiful mountain landscape at sunset")
 
             # Save to outputs
