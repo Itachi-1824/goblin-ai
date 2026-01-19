@@ -12,11 +12,14 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            platform: manylinux
+            platform: linux
+            ext: so
           - os: macos-latest
             platform: macos
+            ext: so
           - os: windows-latest
             platform: windows
+            ext: pyd
 
     runs-on: ${{ matrix.os }}
     name: Build ${{ matrix.platform }}
@@ -108,8 +111,44 @@ jobs:
           name: wheel-${{ matrix.platform }}
           path: dist/*.whl
 
-  publish:
+      - name: Upload binaries
+        uses: actions/upload-artifact@v4
+        with:
+          name: binaries-${{ matrix.platform }}
+          path: goblin/*.${{ matrix.ext }}
+
+  commit-binaries:
     needs: build
+    runs-on: ubuntu-latest
+    name: Commit binaries to repo
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Download all binaries
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts/
+
+      - name: Copy binaries to goblin/
+        run: |
+          cp artifacts/binaries-linux/*.so goblin/ 2>/dev/null || true
+          cp artifacts/binaries-macos/*.so goblin/ 2>/dev/null || true
+          cp artifacts/binaries-windows/*.pyd goblin/ 2>/dev/null || true
+          ls -la goblin/
+
+      - name: Commit and push binaries
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add goblin/*.so goblin/*.pyd
+          git commit -m "chore: update compiled binaries for all platforms" || echo "No changes to commit"
+          git push
+
+  publish:
+    needs: [build, commit-binaries]
     runs-on: ubuntu-latest
     name: Publish to PyPI
 
@@ -121,7 +160,9 @@ jobs:
           merge-multiple: true
 
       - name: List wheels
-        run: ls -la dist/
+        run: |
+          find dist/ -name "*.whl" -exec mv {} dist/ \;
+          ls -la dist/*.whl
 
       - name: Set up Python
         uses: actions/setup-python@v5

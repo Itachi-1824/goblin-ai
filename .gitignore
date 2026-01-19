@@ -4,10 +4,9 @@ dist/
 *.egg-info/
 wheelhouse/
 
-# Compiled files (CI builds these)
-*.so
-*.pyd
+# Compiled files (except goblin binaries which CI commits)
 *.c
+goblin/*.pyi
 
 # Source files (NEVER commit these - compiled binaries only!)
 # Block ALL .py files in goblin/ by default
