@@ -13,6 +13,8 @@ jobs:
   build:
     strategy:
       matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: ['3.11', '3.12', '3.13']
         include:
           - os: ubuntu-latest
             platform: linux
@@ -25,15 +27,15 @@ jobs:
             ext: pyd
 
     runs-on: ${{ matrix.os }}
-    name: Build ${{ matrix.platform }}
+    name: Build ${{ matrix.platform }} py${{ matrix.python-version }}
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: ${{ matrix.python-version }}
 
       - name: Install build tools
         run: pip install nuitka ordered-set zstandard wheel setuptools
@@ -108,7 +110,7 @@ jobs:
       - name: Upload binaries
         uses: actions/upload-artifact@v4
         with:
-          name: binaries-${{ matrix.platform }}
+          name: binaries-${{ matrix.platform }}-py${{ matrix.python-version }}
           path: goblin/*.${{ matrix.ext }}
 
   package-and-publish:
@@ -137,10 +139,11 @@ jobs:
 
       - name: Copy all binaries to goblin/
         run: |
-          # Copy all platform binaries into goblin/
-          cp artifacts/binaries-linux/*.so goblin/ 2>/dev/null || true
-          cp artifacts/binaries-macos/*.so goblin/ 2>/dev/null || true
-          cp artifacts/binaries-windows/*.pyd goblin/ 2>/dev/null || true
+          # Copy all platform and Python version binaries into goblin/
+          for dir in artifacts/binaries-*/; do
+            cp "$dir"*.so goblin/ 2>/dev/null || true
+            cp "$dir"*.pyd goblin/ 2>/dev/null || true
+          done
           echo "=== All binaries ==="
           ls -la goblin/*.so goblin/*.pyd 2>/dev/null || true
 
@@ -154,7 +157,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add goblin/*.so goblin/*.pyd
-          git commit -m "chore: update compiled binaries for all platforms" || echo "No changes to commit"
+          git commit -m "chore: update compiled binaries for all platforms and Python versions" || echo "No changes to commit"
           git push origin main
 
       - name: Publish to PyPI
