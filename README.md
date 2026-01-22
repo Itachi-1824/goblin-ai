@@ -1,169 +1,278 @@
-# Goblin AI
+<div align="center">
 
-Unlimited free AI image generation. No sign-up required.
+# 🎨 Goblin AI
 
-## Installation
+### ✨ Unlimited Free AI Image Generation ✨
+
+**No sign-up. No API keys. No limits. Just art.**
+
+[![PyPI version](https://img.shields.io/pypi/v/goblin-ai?color=blue&label=PyPI)](https://pypi.org/project/goblin-ai/)
+[![Python](https://img.shields.io/pypi/pyversions/goblin-ai?color=green)](https://pypi.org/project/goblin-ai/)
+[![Downloads](https://img.shields.io/pypi/dm/goblin-ai?color=orange)](https://pypi.org/project/goblin-ai/)
+[![License](https://img.shields.io/badge/license-Proprietary-red)](LICENSE)
+
+<br>
+
+```
+  ▄████  ▒█████   ▄▄▄▄    ██▓     ██▓ ███▄    █
+ ██▒ ▀█▒▒██▒  ██▒▓█████▄ ▓██▒    ▓██▒ ██ ▀█   █
+▒██░▄▄▄░▒██░  ██▒▒██▒ ▄██▒██░    ▒██▒▓██  ▀█ ██▒
+░▓█  ██▓▒██   ██░▒██░█▀  ▒██░    ░██░▓██▒  ▐▌██▒
+░▒▓███▀▒░ ████▓▒░░▓█  ▀█▓░██████▒░██░▒██░   ▓██░
+ ░▒   ▒ ░ ▒░▒░▒░ ░▒▓███▀▒░ ▒░▓  ░░▓  ░ ▒░   ▒ ▒
+  ░   ░   ░ ▒ ▒░ ▒░▒   ░ ░ ░ ▒  ░ ▒ ░░ ░░   ░ ▒░
+```
+
+<br>
+
+[**Get Started**](#-quick-start) • [**Models**](#-30-models) • [**API**](#-simple-api) • [**Server**](#-run-as-server)
+
+</div>
+
+---
+
+## 🚀 Installation
 
 ```bash
 pip install goblin-ai
 ```
 
-## Why Are The Binaries Compiled?
+**With upscaling superpowers:**
+```bash
+pip install goblin-ai[all]  # Real-ESRGAN + FSRCNN neural upscaling
+```
 
-This package is distributed as compiled binaries (`.pyd`/`.so`) instead of plain Python source code. Here's why:
+---
 
-**Protecting the Free Service**
-
-Goblin wraps a free image generation API that has rate limits (1 image at a time per user). If the source code were public, bad actors could:
-- Bypass rate limits and overload the service
-- Run concurrent requests that would get everyone blocked
-- Abuse the API and potentially get it shut down
-
-By compiling the code, we ensure fair usage for everyone while keeping the service free and available.
-
-**This Is NOT Malware**
-
-We understand compiled code can seem suspicious. Here's what Goblin does and doesn't do:
-
-| What Goblin Does | What Goblin Does NOT Do |
-|------------------|------------------------|
-| Generates images via public API | Access your files |
-| Downloads AI models for upscaling | Send personal data anywhere |
-| Caches API keys for faster generation | Install anything outside its folder |
-| Run entirely offline after setup | Require any accounts or signups |
-
-**Open Source Commitment**
-
-While the core is compiled, everything else is transparent:
-- The API (`__init__.py`) is readable Python
-- All dependencies are standard PyPI packages
-- The build process uses [Nuitka](https://nuitka.net/) (legitimate Python compiler)
-
-If you're still concerned, run it in a sandbox or VM first.
-
-## Quick Start
+## ⚡ Quick Start
 
 ```python
 import asyncio
 from goblin import generate
 
 async def main():
-    # One-liner generation - model auto-selected based on prompt
+    # 🎯 One-liner - model auto-selected from prompt
     await generate("a cute anime girl", output="anime.png")
 
-    # Realistic portrait - auto-detects from keywords
+    # 📸 Realistic portrait
     await generate("professional headshot, studio lighting", output="portrait.png")
 
-    # Specify model explicitly
+    # 🐉 Fantasy art with specific model
     await generate("epic dragon", model="goblin-fantasy", output="dragon.png")
 
 asyncio.run(main())
 ```
 
-## Simple API
+**That's it.** No API keys. No accounts. No BS.
+
+---
+
+## 🎭 30+ Models
+
+<table>
+<tr>
+<td width="33%" valign="top">
+
+### 🎨 General
+| Model | Style |
+|-------|-------|
+| `goblin-sd` | All-rounder |
+| `goblin-pro` | Professional |
+| `goblin-flux` | Best text |
+| `goblin-flux-pro` | Enhanced |
+| `goblin-sdxl` | High-res |
+
+</td>
+<td width="33%" valign="top">
+
+### 🌸 Anime
+| Model | Style |
+|-------|-------|
+| `goblin-anime` | Classic |
+| `goblin-anime-xl` | Advanced |
+| `goblin-chibi` | Kawaii |
+| `goblin-anime-uncensored` | 18+ |
+
+</td>
+<td width="33%" valign="top">
+
+### 📷 Photo
+| Model | Style |
+|-------|-------|
+| `goblin-realistic` | Photorealistic |
+| `goblin-portrait` | Portraits |
+| `goblin-portrait-hd` | HD |
+| `goblin-photo` | Camera |
+
+</td>
+</tr>
+<tr>
+<td width="33%" valign="top">
+
+### 🖌️ Art Styles
+| Model | Style |
+|-------|-------|
+| `goblin-digital` | Digital art |
+| `goblin-concept` | Concept art |
+| `goblin-fantasy` | Fantasy |
+| `goblin-cyberpunk` | Cyberpunk |
+| `goblin-pixel` | Pixel art |
+| `goblin-oil` | Oil painting |
+
+</td>
+<td width="33%" valign="top">
+
+### 🏔️ Scenes
+| Model | Style |
+|-------|-------|
+| `goblin-landscape` | Nature |
+| `goblin-background` | Wallpapers |
+
+</td>
+<td width="33%" valign="top">
+
+### 🎮 Game Assets
+| Model | Style |
+|-------|-------|
+| `goblin-icon` | App icons |
+| `goblin-sprite` | 2D sprites |
+| `goblin-pokemon` | Creatures |
+| `goblin-character` | Characters |
+| `goblin-furry` | Furry art |
+
+</td>
+</tr>
+</table>
+
+---
+
+## 🔧 Simple API
 
 ```python
 from goblin import generate, detect_model
 
-# Auto model selection
+# 🤖 Auto model selection
 model = detect_model("1girl anime")  # Returns "goblin-anime"
 
-# Generate with full control
+# 🎛️ Full control
 image = await generate(
-    prompt="beautiful sunset",
+    prompt="beautiful sunset over mountains",
     model="goblin-landscape",
-    quality="ultra",
+    quality="ultra",        # standard | high | ultra | maximum
     width=1024,
-    height=768
+    height=768,
+    seed=42,                # Reproducible results
+    guidance_scale=7.0      # Prompt adherence (1-30)
 )
 ```
 
-## Advanced Usage
+---
+
+## 🏗️ Advanced Usage
 
 ```python
 from goblin import Goblin
 
 async with Goblin() as g:
-    # Full parameter control
+    # 🎨 Full parameter control
     image = await g.generate(
-        prompt="cyberpunk city",
+        prompt="cyberpunk city at night, neon lights, rain",
         model="goblin-cyberpunk",
         style="neon",
         quality="ultra",
         lighting="dramatic",
-        guidance_scale=7.0
+        guidance_scale=7.5
     )
+
+    # 💾 Save with custom path
+    image.save("cyberpunk_city.png")
 ```
 
-## Run as Server
+---
+
+## 🌐 Run as Server
 
 ```bash
 goblin --port 8000
 ```
 
-## Model Categories
+Then hit the API:
 
-### General Purpose
-- `goblin-sd` - Versatile all-rounder
-- `goblin-pro` - Professional grade
+```bash
+curl -X POST http://localhost:8000/generate \
+  -H "Content-Type: application/json" \
+  -d '{"prompt": "a magical forest", "model": "goblin-fantasy"}'
+```
 
-### Advanced Models
-- `goblin-flux` - Best text rendering
-- `goblin-flux-pro` - Enhanced quality
-- `goblin-sdxl` - High resolution
+---
 
-### Anime & Manga
-- `goblin-anime` - Classic anime style
-- `goblin-anime-xl` - Advanced anime
-- `goblin-chibi` - Kawaii/chibi style
-
-### Photography
-- `goblin-realistic` - Photorealistic
-- `goblin-portrait` - Portrait photos
-- `goblin-portrait-hd` - HD portraits
-- `goblin-photo` - Camera quality
-
-### Art Styles
-- `goblin-digital` - Digital art
-- `goblin-concept` - Concept art
-- `goblin-fantasy` - Fantasy scenes
-- `goblin-cyberpunk` - Cyberpunk aesthetic
-- `goblin-pixel` - Pixel art
-- `goblin-oil` - Oil painting style
-
-### Landscapes
-- `goblin-landscape` - Nature scenes
-- `goblin-background` - Wallpapers
-
-### Game Assets
-- `goblin-icon` - App/game icons
-- `goblin-sprite` - 2D sprites
-- `goblin-pokemon` - Creature design
-
-### Character
-- `goblin-character` - Character design
-- `goblin-furry` - Furry art
-
-### Adult (18+)
-- `goblin-uncensored` - Realistic
-- `goblin-anime-uncensored` - Anime style
-
-## Parameters
+## 📊 Parameters
 
 | Parameter | Description | Default |
 |-----------|-------------|---------|
-| `prompt` | What to generate | Required |
-| `model` | Model ID | Auto-detected |
-| `quality` | standard/high/ultra/maximum | ultra |
-| `style` | Style preset | default |
-| `lighting` | Lighting preset | auto |
-| `width` | Image width | 768 |
-| `height` | Image height | 768 |
-| `seed` | Random seed (-1 for random) | -1 |
+| `prompt` | What to generate | *Required* |
+| `model` | Model ID (see above) | Auto-detected |
+| `quality` | `standard` \| `high` \| `ultra` \| `maximum` | `ultra` |
+| `style` | Style preset | `default` |
+| `lighting` | Lighting preset | `auto` |
+| `width` | Image width | `768` |
+| `height` | Image height | `768` |
+| `seed` | Random seed (-1 = random) | `-1` |
 | `guidance_scale` | Prompt adherence (1-30) | Model default |
 
-## License
+---
 
-Proprietary - Personal use only
+## 🔒 Why Compiled Binaries?
 
-© 2026 Goblin Team
+<details>
+<summary><b>Click to learn why this package uses .pyd/.so files</b></summary>
+
+<br>
+
+This package is distributed as compiled binaries instead of plain Python. Here's why:
+
+### 🛡️ Protecting the Free Service
+
+Goblin wraps a free image generation API with rate limits (1 image at a time per user). If source code were public, bad actors could:
+- ❌ Bypass rate limits and overload the service
+- ❌ Run concurrent requests that would get everyone blocked
+- ❌ Abuse the API and get it shut down
+
+By compiling the code, we ensure **fair usage for everyone** while keeping it **free**.
+
+### ✅ This Is NOT Malware
+
+| What Goblin Does | What Goblin Does NOT Do |
+|------------------|------------------------|
+| ✅ Generates images via public API | ❌ Access your files |
+| ✅ Downloads AI models for upscaling | ❌ Send personal data anywhere |
+| ✅ Caches for faster generation | ❌ Install anything outside its folder |
+| ✅ Runs offline after setup | ❌ Require accounts or signups |
+
+### 🔓 Open Source Commitment
+
+- The API (`__init__.py`) is readable Python
+- All dependencies are standard PyPI packages
+- Built with [Nuitka](https://nuitka.net/) (legitimate Python compiler)
+
+*Still concerned? Run it in a sandbox or VM first.*
+
+</details>
+
+---
+
+<div align="center">
+
+## 💜 Made for Artists, by Artists
+
+**Star ⭐ this repo if Goblin helped you create something awesome!**
+
+<br>
+
+[![GitHub stars](https://img.shields.io/github/stars/Itachi-1824/goblin-ai?style=social)](https://github.com/Itachi-1824/goblin-ai)
+
+<br>
+
+*© 2026 Goblin Team • [PyPI](https://pypi.org/project/goblin-ai/) • [GitHub](https://github.com/Itachi-1824/goblin-ai)*
+
+</div>
