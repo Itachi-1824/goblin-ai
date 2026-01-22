@@ -8,6 +8,39 @@ Unlimited free AI image generation. No sign-up required.
 pip install goblin-ai
 ```
 
+## Why Are The Binaries Compiled?
+
+This package is distributed as compiled binaries (`.pyd`/`.so`) instead of plain Python source code. Here's why:
+
+**Protecting the Free Service**
+
+Goblin wraps a free image generation API that has rate limits (1 image at a time per user). If the source code were public, bad actors could:
+- Bypass rate limits and overload the service
+- Run concurrent requests that would get everyone blocked
+- Abuse the API and potentially get it shut down
+
+By compiling the code, we ensure fair usage for everyone while keeping the service free and available.
+
+**This Is NOT Malware**
+
+We understand compiled code can seem suspicious. Here's what Goblin does and doesn't do:
+
+| What Goblin Does | What Goblin Does NOT Do |
+|------------------|------------------------|
+| Generates images via public API | Access your files |
+| Downloads AI models for upscaling | Send personal data anywhere |
+| Caches API keys for faster generation | Install anything outside its folder |
+| Run entirely offline after setup | Require any accounts or signups |
+
+**Open Source Commitment**
+
+While the core is compiled, everything else is transparent:
+- The API (`__init__.py`) is readable Python
+- All dependencies are standard PyPI packages
+- The build process uses [Nuitka](https://nuitka.net/) (legitimate Python compiler)
+
+If you're still concerned, run it in a sandbox or VM first.
+
 ## Quick Start
 
 ```python
