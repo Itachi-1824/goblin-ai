@@ -71,7 +71,7 @@ jobs:
       - name: Compile with Nuitka (Unix)
         if: runner.os != 'Windows'
         run: |
-          for module in _core _guard easy generator models parameters server prompts; do
+          for module in _core _guard easy generator models parameters server prompts pool upscaler; do
             echo "Compiling $module..."
             python -m nuitka --module goblin/${module}.py --output-dir=goblin --remove-output
           done
@@ -80,7 +80,7 @@ jobs:
         if: runner.os == 'Windows'
         shell: cmd
         run: |
-          for %%m in (_core _guard easy generator models parameters server prompts) do (
+          for %%m in (_core _guard easy generator models parameters server prompts pool upscaler) do (
             echo Compiling %%m...
             python -m nuitka --module goblin/%%m.py --output-dir=goblin --remove-output
           )
@@ -89,7 +89,7 @@ jobs:
         shell: python
         run: |
           import os
-          for f in ['_core.py', '_guard.py', 'easy.py', 'generator.py', 'models.py', 'parameters.py', 'server.py', 'prompts.py']:
+          for f in ['_core.py', '_guard.py', 'easy.py', 'generator.py', 'models.py', 'parameters.py', 'server.py', 'prompts.py', 'pool.py', 'upscaler.py']:
             path = os.path.join('goblin', f)
             if os.path.exists(path):
               os.remove(path)

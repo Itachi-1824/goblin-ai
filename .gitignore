@@ -3,16 +3,31 @@ build/
 dist/
 *.egg-info/
 wheelhouse/
+test_out/
 
 # Compiled files (except goblin binaries which CI commits)
 *.c
 goblin/*.pyi
 
-# Source files (NEVER commit these - compiled binaries only!)
-# Block ALL .py files in goblin/ by default
+# ============================================
+# SOURCE FILES - NEVER COMMIT THESE!
+# ============================================
+# Block ALL .py source files in goblin/
+goblin/_core.py
+goblin/_guard.py
+goblin/easy.py
+goblin/generator.py
+goblin/models.py
+goblin/parameters.py
+goblin/pool.py
+goblin/prompts.py
+goblin/server.py
+goblin/upscaler.py
+
+# Fallback: block any .py not explicitly allowed
 goblin/*.py
 
-# Allow only loader files (no sensitive data)
+# Allow only loader files (no sensitive code)
 !goblin/__init__.py
 !goblin/__main__.py
 
@@ -42,8 +57,29 @@ Thumbs.db
 obfuscate.py
 xor_encrypt.py
 build_secure.py
+build.py
 
 # Encrypted source bundle (NEVER commit)
 GOBLIN_SOURCE.txt
 GOBLIN_SOURCE_1.txt
 GOBLIN_SOURCE_2.txt
+source.tar
+*.tar.xz
+
+# Test files and artifacts
+test_*.py
+analyze_*.py
+capture_*.py
+find_*.py
+get_*.py
+investigate_*.py
+cloud_*.py
+*.jpg
+*.png
+*.html
+downloaded_files/
+tor_data/
+nul
+
+# Downloaded models (auto-downloaded on demand)
+goblin/.models/

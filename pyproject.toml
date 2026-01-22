@@ -29,6 +29,22 @@ dependencies = [
     "pydantic>=2.0.0",
     "camoufox[geoip]>=0.4.0",
     "curl_cffi>=0.9.0",
+    "opencv-python>=4.8.0",
+    "numpy>=1.24.0",
+]
+
+[project.optional-dependencies]
+quality = [
+    "opencv-contrib-python>=4.8.0",  # For FSRCNN neural upscaling
+]
+best = [
+    "realesrgan>=0.3.0",              # For Real-ESRGAN upscaling
+    "basicsr>=1.4.0",
+]
+all = [
+    "opencv-contrib-python>=4.8.0",
+    "realesrgan>=0.3.0",
+    "basicsr>=1.4.0",
 ]
 
 [project.scripts]

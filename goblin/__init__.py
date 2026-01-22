@@ -25,10 +25,17 @@ from .parameters import (
     get_composition, get_expression, get_resolution
 )
 from .prompts import (
-    random_prompt, enhance_prompt, enhance_for_model,
-    random_character_prompt, random_landscape_prompt, random_anime_prompt,
-    create_variations, list_categories, list_art_styles, list_environments,
-    list_model_types
+    random_prompt, random_character_prompt, random_landscape_prompt,
+    random_anime_prompt, create_variations, list_categories, list_art_styles,
+    list_environments, list_model_types
+)
+from .upscaler import (
+    upscale, upscale_ultra, enhance, UpscaleStrategy, UpscaleModel,
+    calculate_base_resolution, get_best_shape_for_aspect,
+    validate_dimensions, needs_upscale,
+    MIN_DIMENSION, MAX_DIMENSION, SHAPE_RESOLUTIONS,
+    list_models as list_upscale_models, download_model, delete_model,
+    get_downloaded_models, set_device, get_device, is_gpu_available
 )
 
 __version__ = "1.1.0"
@@ -76,8 +83,6 @@ __all__ = [
 
     # Prompt Tools
     "random_prompt",
-    "enhance_prompt",
-    "enhance_for_model",
     "random_character_prompt",
     "random_landscape_prompt",
     "random_anime_prompt",
@@ -86,4 +91,25 @@ __all__ = [
     "list_art_styles",
     "list_environments",
     "list_model_types",
+
+    # Upscaler
+    "upscale",
+    "upscale_ultra",
+    "enhance",
+    "UpscaleStrategy",
+    "UpscaleModel",
+    "calculate_base_resolution",
+    "get_best_shape_for_aspect",
+    "validate_dimensions",
+    "needs_upscale",
+    "MIN_DIMENSION",
+    "MAX_DIMENSION",
+    "SHAPE_RESOLUTIONS",
+    "list_upscale_models",
+    "download_model",
+    "delete_model",
+    "get_downloaded_models",
+    "set_device",
+    "get_device",
+    "is_gpu_available",
 ]
