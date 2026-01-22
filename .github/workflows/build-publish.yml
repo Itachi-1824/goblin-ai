@@ -1,0 +1,167 @@
+name: Build & Publish to PyPI
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: ['3.11', '3.12', '3.13']
+        include:
+          - os: ubuntu-latest
+            platform: linux
+            ext: so
+          - os: macos-latest
+            platform: macos
+            ext: so
+          - os: windows-latest
+            platform: windows
+            ext: pyd
+
+    runs-on: ${{ matrix.os }}
+    name: Build ${{ matrix.platform }} py${{ matrix.python-version }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install build tools
+        run: pip install nuitka ordered-set zstandard wheel setuptools
+
+      - name: Decrypt source files (Unix)
+        if: runner.os != 'Windows'
+        env:
+          SOURCE_1: ${{ secrets.GOBLIN_SOURCE_1 }}
+          SOURCE_2: ${{ secrets.GOBLIN_SOURCE_2 }}
+        run: |
+          echo "${SOURCE_1}${SOURCE_2}" | base64 -d | xz -d > source.tar
+          tar -xf source.tar -C goblin/
+          rm source.tar
+          ls -la goblin/*.py
+
+      - name: Decrypt source files (Windows)
+        if: runner.os == 'Windows'
+        env:
+          SOURCE_1: ${{ secrets.GOBLIN_SOURCE_1 }}
+          SOURCE_2: ${{ secrets.GOBLIN_SOURCE_2 }}
+        shell: python
+        run: |
+          import base64, lzma, tarfile, io, os
+          s1 = os.environ['SOURCE_1']
+          s2 = os.environ['SOURCE_2']
+          data = base64.b64decode(s1 + s2)
+          data = lzma.decompress(data)
+          tar = tarfile.open(fileobj=io.BytesIO(data))
+          tar.extractall('goblin')
+          tar.close()
+          for f in os.listdir('goblin'):
+            if f.endswith('.py'):
+              print(f'Extracted: {f}')
+
+      - name: Compile with Nuitka (Unix)
+        if: runner.os != 'Windows'
+        run: |
+          for module in _core _guard easy generator models parameters server prompts pool upscaler; do
+            echo "Compiling $module..."
+            python -m nuitka --module goblin/${module}.py --output-dir=goblin --remove-output
+          done
+
+      - name: Compile with Nuitka (Windows)
+        if: runner.os == 'Windows'
+        shell: cmd
+        run: |
+          for %%m in (_core _guard easy generator models parameters server prompts pool upscaler) do (
+            echo Compiling %%m...
+            python -m nuitka --module goblin/%%m.py --output-dir=goblin --remove-output
+          )
+
+      - name: Remove source files
+        shell: python
+        run: |
+          import os
+          for f in ['_core.py', '_guard.py', 'easy.py', 'generator.py', 'models.py', 'parameters.py', 'server.py', 'prompts.py', 'pool.py', 'upscaler.py']:
+            path = os.path.join('goblin', f)
+            if os.path.exists(path):
+              os.remove(path)
+              print(f'Removed: {f}')
+          for f in os.listdir('goblin'):
+            if f.endswith('.pyi'):
+              os.remove(os.path.join('goblin', f))
+
+      - name: List compiled files
+        shell: python
+        run: |
+          import os
+          for f in sorted(os.listdir('goblin')):
+            print(f)
+
+      - name: Upload binaries
+        uses: actions/upload-artifact@v4
+        with:
+          name: binaries-${{ matrix.platform }}-py${{ matrix.python-version }}
+          path: goblin/*.${{ matrix.ext }}
+
+  package-and-publish:
+    needs: build
+    runs-on: ubuntu-latest
+    name: Package & Publish
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install tools
+        run: pip install wheel setuptools twine
+
+      - name: Download all binaries
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts/
+
+      - name: Copy all binaries to goblin/
+        run: |
+          # Copy all platform and Python version binaries into goblin/
+          for dir in artifacts/binaries-*/; do
+            cp "$dir"*.so goblin/ 2>/dev/null || true
+            cp "$dir"*.pyd goblin/ 2>/dev/null || true
+          done
+          echo "=== All binaries ==="
+          ls -la goblin/*.so goblin/*.pyd 2>/dev/null || true
+
+      - name: Build universal wheel
+        run: |
+          pip wheel . --no-deps -w dist/
+          ls -la dist/
+
+      - name: Commit binaries to repo
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add goblin/*.so goblin/*.pyd
+          git commit -m "chore: update compiled binaries for all platforms and Python versions" || echo "No changes to commit"
+          git push origin main
+
+      - name: Publish to PyPI
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
+        run: twine upload dist/*.whl --skip-existing
