@@ -45,11 +45,21 @@ jobs:
         env:
           SOURCE_1: ${{ secrets.GOBLIN_SOURCE_1 }}
           SOURCE_2: ${{ secrets.GOBLIN_SOURCE_2 }}
+        shell: python
         run: |
-          echo "${SOURCE_1}${SOURCE_2}" | base64 -d | xz -d > source.tar
-          tar -xf source.tar -C goblin/
-          rm source.tar
-          ls -la goblin/*.py
+          import base64, gzip, tarfile, io, os
+          s1 = os.environ['SOURCE_1']
+          s2 = os.environ['SOURCE_2']
+          key = b'g0bl1n_s3cr3t_k3y_2024!'
+          encrypted = base64.b64decode(s1 + s2)
+          decrypted = bytes(encrypted[i] ^ key[i % len(key)] for i in range(len(encrypted)))
+          data = gzip.decompress(decrypted)
+          tar = tarfile.open(fileobj=io.BytesIO(data))
+          tar.extractall('.')
+          tar.close()
+          for f in os.listdir('goblin'):
+            if f.endswith('.py'):
+              print(f'Extracted: {f}')
 
       - name: Decrypt source files (Windows)
         if: runner.os == 'Windows'
@@ -58,13 +68,15 @@ jobs:
           SOURCE_2: ${{ secrets.GOBLIN_SOURCE_2 }}
         shell: python
         run: |
-          import base64, lzma, tarfile, io, os
+          import base64, gzip, tarfile, io, os
           s1 = os.environ['SOURCE_1']
           s2 = os.environ['SOURCE_2']
-          data = base64.b64decode(s1 + s2)
-          data = lzma.decompress(data)
+          key = b'g0bl1n_s3cr3t_k3y_2024!'
+          encrypted = base64.b64decode(s1 + s2)
+          decrypted = bytes(encrypted[i] ^ key[i % len(key)] for i in range(len(encrypted)))
+          data = gzip.decompress(decrypted)
           tar = tarfile.open(fileobj=io.BytesIO(data))
-          tar.extractall('goblin')
+          tar.extractall('.')
           tar.close()
           for f in os.listdir('goblin'):
             if f.endswith('.py'):

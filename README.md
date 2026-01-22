@@ -34,6 +34,17 @@ pip install goblin-ai
 pip install goblin-ai[all]  # Real-ESRGAN + FSRCNN neural upscaling
 ```
 
+### 💻 System Requirements
+
+| Resolution | CPU | GPU (Optional) |
+|------------|-----|----------------|
+| Up to 768px | Any modern CPU | Not required |
+| Up to 1024px | Any modern CPU | Any GPU with 2GB+ VRAM |
+| 1024px - 2048px | i5/Ryzen 5+ | **GTX 1650** or higher recommended |
+| 2048px - 4096px | i7/Ryzen 7+ | **GTX 1660** or RTX series recommended |
+
+> **Note:** GPU acceleration (CUDA/DirectML) is optional but highly recommended for high-resolution upscaling. Without GPU, images >1024px may be slow on CPU.
+
 ---
 
 ## ⚡ Quick Start
@@ -207,10 +218,42 @@ curl -X POST http://localhost:8000/generate \
 | `quality` | `standard` \| `high` \| `ultra` \| `maximum` | `ultra` |
 | `style` | Style preset | `default` |
 | `lighting` | Lighting preset | `auto` |
-| `width` | Image width | `768` |
-| `height` | Image height | `768` |
+| `width` | Image width (64-4096px) | `768` |
+| `height` | Image height (64-4096px) | `768` |
 | `seed` | Random seed (-1 = random) | `-1` |
 | `guidance_scale` | Prompt adherence (1-30) | Model default |
+| `enhance_output` | Smart enhancement pipeline | `True` |
+| `upscale_output` | 4x AI upscaling (slower) | `False` |
+
+---
+
+## 🔬 Upscaling & Enhancement
+
+Goblin includes a powerful AI upscaling system with 24+ models:
+
+```python
+from goblin import generate
+
+# Auto-enhanced output (default) - resize + restore + PNG
+image = await generate("dragon", width=1920, height=1080)
+
+# 4x AI upscaling for maximum quality
+image = await generate("dragon", width=4096, height=4096, upscale_output=True)
+
+# Raw output (no enhancement, JPEG from API)
+image = await generate("dragon", enhance_output=False)
+```
+
+### 🚀 Upscale Performance
+
+| Target Size | GPU (GTX 1650+) | CPU Only |
+|-------------|-----------------|----------|
+| 768px | ~1s | ~3s |
+| 1024px | ~2s | ~8s |
+| 2048px | ~5s | ~30s |
+| 4096px | ~15s | ~2min |
+
+> **Tip:** For images >1024px, a GPU with 4GB+ VRAM provides 5-10x faster upscaling.
 
 ---
 

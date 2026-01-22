@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "goblin-ai"
-version = "1.0.0"
+version = "2.0.0"
 description = "Unlimited free AI image generation. No sign-up required."
 readme = "README.md"
 license = {text = "Proprietary"}
