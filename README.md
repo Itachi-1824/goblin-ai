@@ -13,15 +13,7 @@
 
 <br>
 
-```
-  ▄████  ▒█████   ▄▄▄▄    ██▓     ██▓ ███▄    █
- ██▒ ▀█▒▒██▒  ██▒▓█████▄ ▓██▒    ▓██▒ ██ ▀█   █
-▒██░▄▄▄░▒██░  ██▒▒██▒ ▄██▒██░    ▒██▒▓██  ▀█ ██▒
-░▓█  ██▓▒██   ██░▒██░█▀  ▒██░    ░██░▓██▒  ▐▌██▒
-░▒▓███▀▒░ ████▓▒░░▓█  ▀█▓░██████▒░██░▒██░   ▓██░
- ░▒   ▒ ░ ▒░▒░▒░ ░▒▓███▀▒░ ▒░▓  ░░▓  ░ ▒░   ▒ ▒
-  ░   ░   ░ ▒ ▒░ ▒░▒   ░ ░ ░ ▒  ░ ▒ ░░ ░░   ░ ▒░
-```
+<img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=28&duration=3000&pause=1000&color=9B59B6&center=true&vCenter=true&width=500&lines=Generate+anything...;Anime+%F0%9F%8C%B8;Portraits+%F0%9F%93%B7;Fantasy+%F0%9F%90%89;Cyberpunk+%F0%9F%8C%83;Pixel+Art+%F0%9F%8E%AE" alt="Typing SVG" />
 
 <br>
 
@@ -273,6 +265,6 @@ By compiling the code, we ensure **fair usage for everyone** while keeping it **
 
 <br>
 
-*© 2026 Goblin Team • [PyPI](https://pypi.org/project/goblin-ai/) • [GitHub](https://github.com/Itachi-1824/goblin-ai)*
+*© 2026 [Itachi-1824](https://github.com/Itachi-1824) • [PyPI](https://pypi.org/project/goblin-ai/) • [GitHub](https://github.com/Itachi-1824/goblin-ai)*
 
 </div>
