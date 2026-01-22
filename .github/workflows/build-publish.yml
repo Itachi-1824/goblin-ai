@@ -105,25 +105,16 @@ jobs:
           for f in sorted(os.listdir('goblin')):
             print(f)
 
-      - name: Build wheel
-        run: pip wheel . --no-deps -w dist/
-
-      - name: Upload wheel
-        uses: actions/upload-artifact@v4
-        with:
-          name: wheel-${{ matrix.platform }}
-          path: dist/*.whl
-
       - name: Upload binaries
         uses: actions/upload-artifact@v4
         with:
           name: binaries-${{ matrix.platform }}
           path: goblin/*.${{ matrix.ext }}
 
-  commit-binaries:
+  package-and-publish:
     needs: build
     runs-on: ubuntu-latest
-    name: Commit binaries to repo
+    name: Package & Publish
 
     steps:
       - uses: actions/checkout@v4
@@ -131,50 +122,40 @@ jobs:
           ref: main
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install tools
+        run: pip install wheel setuptools twine
+
       - name: Download all binaries
         uses: actions/download-artifact@v4
         with:
           path: artifacts/
 
-      - name: Copy binaries to goblin/
+      - name: Copy all binaries to goblin/
         run: |
+          # Copy all platform binaries into goblin/
           cp artifacts/binaries-linux/*.so goblin/ 2>/dev/null || true
           cp artifacts/binaries-macos/*.so goblin/ 2>/dev/null || true
           cp artifacts/binaries-windows/*.pyd goblin/ 2>/dev/null || true
-          ls -la goblin/
+          echo "=== All binaries ==="
+          ls -la goblin/*.so goblin/*.pyd 2>/dev/null || true
 
-      - name: Commit and push binaries
+      - name: Build universal wheel
+        run: |
+          pip wheel . --no-deps -w dist/
+          ls -la dist/
+
+      - name: Commit binaries to repo
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add goblin/*.so goblin/*.pyd
           git commit -m "chore: update compiled binaries for all platforms" || echo "No changes to commit"
           git push origin main
-
-  publish:
-    needs: [build, commit-binaries]
-    runs-on: ubuntu-latest
-    name: Publish to PyPI
-
-    steps:
-      - name: Download all wheels
-        uses: actions/download-artifact@v4
-        with:
-          path: dist/
-          merge-multiple: true
-
-      - name: List wheels
-        run: |
-          find dist/ -name "*.whl" -exec mv {} dist/ \;
-          ls -la dist/*.whl
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-
-      - name: Install twine
-        run: pip install twine
 
       - name: Publish to PyPI
         env:
