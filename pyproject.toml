@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "goblin-ai"
-version = "1.0.1"
+version = "1.2.0"
 description = "Unlimited free AI image generation. No sign-up required."
 readme = "README.md"
 license = {text = "Proprietary"}
@@ -61,8 +61,8 @@ include-package-data = false
 goblin = ["*.pyd", "*.so", "__init__.py", "__main__.py"]
 
 [tool.setuptools.exclude-package-data]
-"*" = ["_core.py", "_guard.py", "easy.py", "generator.py", "models.py", "parameters.py", "server.py", "prompts.py", "*.pyi", "*.c", "*.h", "*.pyx"]
-goblin = ["_core.py", "_guard.py", "easy.py", "generator.py", "models.py", "parameters.py", "server.py", "prompts.py", "*.pyi", "*.c", "*.h", "*.pyx"]
+"*" = ["_core.py", "_guard.py", "easy.py", "generator.py", "models.py", "parameters.py", "server.py", "prompts.py", "pool.py", "upscaler.py", "*.pyi", "*.c", "*.h", "*.pyx"]
+goblin = ["_core.py", "_guard.py", "easy.py", "generator.py", "models.py", "parameters.py", "server.py", "prompts.py", "pool.py", "upscaler.py", "*.pyi", "*.c", "*.h", "*.pyx"]
 
 [tool.cibuildwheel]
 build = "cp311-* cp312-* cp313-*"
