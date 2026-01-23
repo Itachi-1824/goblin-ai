@@ -9,7 +9,7 @@ Simple usage:
 That's it. We handle model selection, optimal settings, everything.
 """
 # Runtime protection
-from . import _guard
+from . import _guard as _guard  # noqa: F401
 
 # Simple API (recommended)
 from .easy import generate, generate_batch, detect_model, close
@@ -38,7 +38,7 @@ from .upscaler import (
     get_downloaded_models, set_device, get_device, is_gpu_available
 )
 
-__version__ = "1.1.0"
+__version__ = "2.1.0"
 __all__ = [
     # Simple API (recommended)
     "generate",

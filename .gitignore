@@ -77,9 +77,21 @@ cloud_*.py
 *.jpg
 *.png
 *.html
+!goblin/web/*.html
 downloaded_files/
 tor_data/
 nul
 
 # Downloaded models (auto-downloaded on demand)
 goblin/.models/
+
+# Key cache
+goblin/.cache/
+
+# Backup source
+goblin_src_backup/
+
+# Secret files
+secret_source_*.txt
+encrypt_source.py
+obfuscate_all.py

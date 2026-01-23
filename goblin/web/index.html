@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GOBLIN - AI Image Generation</title>
+  <meta name="description" content="Generate stunning AI images with 50+ professional models. Fast, powerful, and free.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%23f59e0b' rx='16' width='100' height='100'/><text y='.88em' x='18' font-size='72' font-weight='bold' fill='%23000'>G</text></svg>">
+  <link rel="stylesheet" href="/static/css/main.css">
+</head>
+<body>
+  <div class="app">
+    <!-- Floating Header -->
+    <header class="header">
+      <div class="brand">
+        <span class="brand-icon">G</span>
+        <div class="brand-text">
+          <span class="brand-name">GOBLIN</span>
+          <span class="brand-tag">v2.0</span>
+        </div>
+      </div>
+      <div class="header-status">
+        <span class="status-dot"></span>
+        <span id="statusText">Ready</span>
+      </div>
+    </header>
+
+    <!-- Main Grid -->
+    <main class="main">
+      <!-- Left: Controls -->
+      <aside class="sidebar">
+        <!-- Prompt Section -->
+        <div class="input-block">
+          <div class="input-label">
+            <span class="label-num">01</span>
+            <span class="label-text">PROMPT</span>
+          </div>
+          <textarea
+            id="prompt"
+            class="prompt-input"
+            placeholder="Describe your vision..."
+            rows="4"
+          ></textarea>
+          <div class="input-actions">
+            <button id="randomBtn" class="action-btn" title="Random prompt">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M2 18h1.4c1.3 0 2.5-.6 3.3-1.7l6.1-8.6c.7-1.1 2-1.7 3.3-1.7H22"/>
+                <path d="m18 2 4 4-4 4"/>
+                <path d="M2 6h1.9c1.5 0 2.9.9 3.6 2.2"/>
+                <path d="M22 18h-5.9c-1.3 0-2.6-.7-3.3-1.8l-.5-.8"/>
+                <path d="m18 14 4 4-4 4"/>
+              </svg>
+              <span>Random</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Negative Prompt -->
+        <div class="input-block input-block--subtle">
+          <div class="input-label">
+            <span class="label-num">02</span>
+            <span class="label-text">NEGATIVE</span>
+            <span class="label-opt">optional</span>
+          </div>
+          <textarea
+            id="negativePrompt"
+            class="prompt-input prompt-input--sm"
+            placeholder="What to avoid..."
+            rows="2"
+          ></textarea>
+        </div>
+
+        <!-- Dimensions -->
+        <div class="input-block">
+          <div class="input-label">
+            <span class="label-num">03</span>
+            <span class="label-text">DIMENSIONS</span>
+          </div>
+          <div class="shape-grid">
+            <button class="shape-btn active" data-shape="square">
+              <div class="shape-preview shape-preview--square"></div>
+              <span>1:1</span>
+            </button>
+            <button class="shape-btn" data-shape="portrait">
+              <div class="shape-preview shape-preview--portrait"></div>
+              <span>3:4</span>
+            </button>
+            <button class="shape-btn" data-shape="landscape">
+              <div class="shape-preview shape-preview--landscape"></div>
+              <span>16:9</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Guidance -->
+        <div class="input-block">
+          <div class="input-label">
+            <span class="label-num">04</span>
+            <span class="label-text">GUIDANCE</span>
+            <span id="guidanceValue" class="label-value">7.0</span>
+          </div>
+          <div class="slider-track">
+            <input type="range" id="guidanceSlider" min="1" max="20" value="7" step="0.5">
+            <div class="slider-fill" style="width: 31.5%;"></div>
+          </div>
+          <div class="slider-labels">
+            <span>Creative</span>
+            <span>Precise</span>
+          </div>
+        </div>
+
+        <!-- Seed -->
+        <div class="input-block">
+          <div class="input-label">
+            <span class="label-num">05</span>
+            <span class="label-text">SEED</span>
+            <span class="label-opt">optional</span>
+          </div>
+          <div class="seed-input-row">
+            <input type="number" id="seedInput" class="seed-input" placeholder="Random" min="-1" max="2147483647">
+            <button id="seedRandomBtn" class="action-btn action-btn--icon" title="Use random seed">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M2 18h1.4c1.3 0 2.5-.6 3.3-1.7l6.1-8.6c.7-1.1 2-1.7 3.3-1.7H22"/>
+                <path d="m18 2 4 4-4 4"/>
+                <path d="M2 6h1.9c1.5 0 2.9.9 3.6 2.2"/>
+                <path d="M22 18h-5.9c-1.3 0-2.6-.7-3.3-1.8l-.5-.8"/>
+                <path d="m18 14 4 4-4 4"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Resolution -->
+        <div class="input-block">
+          <div class="input-label">
+            <span class="label-num">06</span>
+            <span class="label-text">UPSCALE</span>
+            <span id="resolutionValue" class="label-value">Off</span>
+          </div>
+          <div class="resolution-presets">
+            <button class="preset-btn active" data-res="0">Off</button>
+            <button class="preset-btn" data-res="1024">HD</button>
+            <button class="preset-btn" data-res="1920">FHD</button>
+            <button class="preset-btn" data-res="2048">2K</button>
+            <button class="preset-btn" data-res="4096">4K</button>
+          </div>
+          <div class="upscale-options" id="upscaleOptions">
+            <div class="gpu-indicator" id="gpuIndicator">
+              <span class="gpu-icon"></span>
+              <span class="gpu-text">Checking...</span>
+            </div>
+            <select id="upscaleModel" class="model-select">
+              <option value="default">Default (x4plus)</option>
+              <option value="realesrgan-x4plus">RealESRGAN x4plus</option>
+              <option value="realesrgan-x4plus-anime">x4plus Anime</option>
+              <option value="remacri">Remacri</option>
+              <option value="ultrasharp">UltraSharp</option>
+              <option value="lanczos">Lanczos (fast)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Models -->
+        <div class="input-block input-block--models">
+          <div class="input-label">
+            <span class="label-num">07</span>
+            <span class="label-text">MODEL</span>
+            <span id="modelCount" class="label-count">--</span>
+          </div>
+          <div id="modelsContainer" class="models-grid">
+            <div class="models-loading">
+              <div class="loading-bar"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Generate -->
+        <button id="generateBtn" class="generate-btn">
+          <span class="generate-text">Generate</span>
+          <span class="generate-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="5" y1="12" x2="19" y2="12"/>
+              <polyline points="12 5 19 12 12 19"/>
+            </svg>
+          </span>
+        </button>
+
+        <div class="shortcut-hint">
+          <kbd>Ctrl</kbd> + <kbd>Enter</kbd>
+        </div>
+      </aside>
+
+      <!-- Right: Canvas -->
+      <section class="canvas-section">
+        <div id="canvas" class="canvas canvas--square">
+          <!-- Empty State -->
+          <div id="placeholder" class="canvas-empty">
+            <div class="empty-frame">
+              <div class="frame-corner frame-corner--tl"></div>
+              <div class="frame-corner frame-corner--tr"></div>
+              <div class="frame-corner frame-corner--bl"></div>
+              <div class="frame-corner frame-corner--br"></div>
+            </div>
+            <div class="empty-text">
+              <span class="empty-title">YOUR IMAGE</span>
+              <span class="empty-subtitle">will appear here</span>
+            </div>
+          </div>
+
+          <!-- Loading State -->
+          <div id="canvasLoader" class="canvas-loader hidden">
+            <div class="loader-ring">
+              <div class="ring ring-1"></div>
+              <div class="ring ring-2"></div>
+              <div class="ring ring-3"></div>
+            </div>
+            <span class="loader-status">Creating...</span>
+          </div>
+
+          <!-- Result -->
+          <img id="resultImage" class="result-image" alt="Generated image">
+        </div>
+
+        <!-- Action Bar -->
+        <div id="actionBar" class="result-actions">
+          <button id="downloadBtn" class="result-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            <span>Download</span>
+          </button>
+          <button id="copyBtn" class="result-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="9" y="9" width="13" height="13" rx="2"/>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+            </svg>
+            <span>Copy</span>
+          </button>
+          <button id="upscaleBtn" class="result-btn result-btn--accent">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="15 3 21 3 21 9"/>
+              <polyline points="9 21 3 21 3 15"/>
+              <line x1="21" y1="3" x2="14" y2="10"/>
+              <line x1="3" y1="21" x2="10" y2="14"/>
+            </svg>
+            <span>Upscale</span>
+          </button>
+          <div class="result-seed">
+            <span class="seed-label">Seed</span>
+            <span id="seedDisplay" class="seed-value">---</span>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Corner Decorations -->
+    <div class="corner-deco corner-deco--bl">FREE</div>
+
+    <!-- Upscale Modal -->
+    <div id="upscaleModal" class="modal hidden">
+      <div class="modal-backdrop"></div>
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title">Upscale Image</h3>
+          <button id="modalClose" class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="modal-section">
+            <label class="modal-label">Preset</label>
+            <div class="modal-presets">
+              <button class="modal-preset" data-w="1024" data-h="1024">HD 1024</button>
+              <button class="modal-preset" data-w="1920" data-h="1080">FHD 1920x1080</button>
+              <button class="modal-preset" data-w="2048" data-h="2048">2K 2048</button>
+              <button class="modal-preset" data-w="4096" data-h="4096">4K 4096</button>
+            </div>
+          </div>
+          <div class="modal-section">
+            <label class="modal-label">Custom Size</label>
+            <div class="modal-custom">
+              <input type="number" id="modalWidth" class="modal-input" placeholder="Width" min="512" max="4096">
+              <span class="modal-x">x</span>
+              <input type="number" id="modalHeight" class="modal-input" placeholder="Height" min="512" max="4096">
+            </div>
+          </div>
+          <div class="modal-section">
+            <label class="modal-label">Model</label>
+            <select id="modalModel" class="modal-select">
+              <option value="realesrgan-x4plus">RealESRGAN x4plus (default)</option>
+              <option value="realesrgan-x4plus-anime">x4plus Anime</option>
+              <option value="remacri">Remacri</option>
+              <option value="ultrasharp">UltraSharp</option>
+              <option value="lanczos">Lanczos (fast)</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button id="modalCancel" class="btn-modal btn-modal--secondary">Cancel</button>
+          <button id="modalConfirm" class="btn-modal btn-modal--primary">Upscale</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/js/app.js" type="module"></script>
+</body>
+</html>

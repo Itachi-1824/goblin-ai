@@ -11,6 +11,9 @@ recursive-include goblin *.so
 include goblin/__init__.py
 include goblin/__main__.py
 
+# Include web UI files
+recursive-include goblin/web *
+
 # EXCLUDE source code - CRITICAL!
 recursive-exclude goblin *.py
 recursive-exclude goblin *.c
