@@ -1,0 +1,181 @@
+name: Compile protected wheels
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: compile-protected-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  compile:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    environment: goblin-protected-build
+    runs-on: ${{ matrix.os }}
+    container: ${{ matrix.container || null }}
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {os: windows-2022, python: '3.11', target: protected-windows-2022-3.11}
+          - {os: windows-2022, python: '3.12', target: protected-windows-2022-3.12}
+          - {os: windows-2022, python: '3.13', target: protected-windows-2022-3.13}
+          - {os: windows-2022, python: '3.14', target: protected-windows-2022-3.14}
+          - {os: macos-15, python: '3.11', target: protected-macos-15-3.11}
+          - {os: macos-15, python: '3.12', target: protected-macos-15-3.12}
+          - {os: macos-15, python: '3.13', target: protected-macos-15-3.13}
+          - {os: macos-15, python: '3.14', target: protected-macos-15-3.14}
+          - {os: macos-15-intel, python: '3.11', target: protected-macos-15-intel-3.11}
+          - {os: macos-15-intel, python: '3.12', target: protected-macos-15-intel-3.12}
+          - {os: macos-15-intel, python: '3.13', target: protected-macos-15-intel-3.13}
+          - {os: macos-15-intel, python: '3.14', target: protected-macos-15-intel-3.14}
+          - {os: ubuntu-24.04, abi: cp311-cp311, container: 'quay.io/pypa/manylinux_2_28_x86_64', target: protected-linux-cp311-cp311}
+          - {os: ubuntu-24.04, abi: cp312-cp312, container: 'quay.io/pypa/manylinux_2_28_x86_64', target: protected-linux-cp312-cp312}
+          - {os: ubuntu-24.04, abi: cp313-cp313, container: 'quay.io/pypa/manylinux_2_28_x86_64', target: protected-linux-cp313-cp313}
+          - {os: ubuntu-24.04, abi: cp314-cp314, container: 'quay.io/pypa/manylinux_2_28_x86_64', target: protected-linux-cp314-cp314}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        if: ${{ !matrix.abi }}
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Select manylinux Python
+        if: ${{ matrix.abi }}
+        env:
+          ABI: ${{ matrix.abi }}
+        run: echo "/opt/python/$ABI/bin" >> "$GITHUB_PATH"
+      - name: Install decryption dependency
+        run: 'python -m pip install --only-binary=:all: cryptography'
+      - name: Compile and verify privately
+        env:
+          BUILD_TARGET: ${{ matrix.target }}
+          BUILD_ABI: ${{ matrix.abi }}
+          GOBLIN_BUILD_KEY: ${{ secrets.GOBLIN_BUILD_KEY }}
+          GOBLIN_BUILD_SOURCE_SHA: ${{ secrets.GOBLIN_BUILD_SOURCE_SHA }}
+          GOBLIN_BUILD_CHUNK_01: ${{ secrets.GOBLIN_BUILD_CHUNK_01 }}
+          GOBLIN_BUILD_CHUNK_02: ${{ secrets.GOBLIN_BUILD_CHUNK_02 }}
+          GOBLIN_BUILD_CHUNK_03: ${{ secrets.GOBLIN_BUILD_CHUNK_03 }}
+          GOBLIN_BUILD_CHUNK_04: ${{ secrets.GOBLIN_BUILD_CHUNK_04 }}
+          GOBLIN_BUILD_CHUNK_05: ${{ secrets.GOBLIN_BUILD_CHUNK_05 }}
+          GOBLIN_BUILD_CHUNK_06: ${{ secrets.GOBLIN_BUILD_CHUNK_06 }}
+          GOBLIN_BUILD_CHUNK_07: ${{ secrets.GOBLIN_BUILD_CHUNK_07 }}
+          GOBLIN_BUILD_CHUNK_08: ${{ secrets.GOBLIN_BUILD_CHUNK_08 }}
+          GOBLIN_BUILD_CHUNK_09: ${{ secrets.GOBLIN_BUILD_CHUNK_09 }}
+          GOBLIN_BUILD_CHUNK_10: ${{ secrets.GOBLIN_BUILD_CHUNK_10 }}
+          GOBLIN_BUILD_CHUNK_11: ${{ secrets.GOBLIN_BUILD_CHUNK_11 }}
+          GOBLIN_BUILD_CHUNK_12: ${{ secrets.GOBLIN_BUILD_CHUNK_12 }}
+        run: |
+          python - <<'PY'
+          import base64, hashlib, io, json, os, re, shutil, stat, subprocess, sys, tempfile, zipfile
+          from pathlib import Path, PurePosixPath
+          from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+
+          modules = {'_cli', '_core', '_guard', 'auto_map', 'easy', 'generator', 'models',
+                     'parameters', 'pool', 'prompts', 'server', 'upscaler', 'web'}
+          allowed = {name + '.py' for name in modules} | {
+              '__init__.py', '__main__.py', 'build_release.py', 'verify_wheel.py',
+              'install_build_dependencies.py', 'run_tests.py',
+              'tests/conftest.py', 'tests/test_upscaler.py', 'tests/test_runtime.py',
+              'tests/test_release.py', 'tests/test_privacy.py', 'tests/test_key_acquisition.py',
+              'tests/test_image_boundaries.py', 'tests/test_documentation.py',
+              'release/setup.py', 'release/README.md', 'release/pyproject.toml',
+              'release/MODEL_LICENSES.md', 'release/MANIFEST.in', 'release/LICENSE',
+              'release/docs/upscaling.md', 'release/docs/troubleshooting.md',
+              'release/docs/server.md', 'release/docs/openapi.json',
+              'release/docs/models-and-prompts.md', 'release/docs/index.md',
+              'release/docs/getting-started.md', 'release/docs/generation.md',
+              'release/docs/api-reference.md'}
+          phase = 'decrypt'
+          try:
+              checkout = Path(os.environ['GITHUB_WORKSPACE']).resolve()
+              runner = Path(os.environ['RUNNER_TEMP']).resolve()
+              source_sha = os.environ['GOBLIN_BUILD_SOURCE_SHA']
+              if not re.fullmatch(r'[0-9a-f]{40}', source_sha):
+                  raise ValueError()
+              chunks = [os.environ.get(f'GOBLIN_BUILD_CHUNK_{i:02}', '') for i in range(1, 13)]
+              if any(len(chunk) > 24000 for chunk in chunks):
+                  raise ValueError()
+              key = base64.b64decode(os.environ['GOBLIN_BUILD_KEY'], validate=True)
+              encrypted = base64.b64decode(''.join(chunks), validate=True)
+              if len(key) != 32 or len(encrypted) < 28:
+                  raise ValueError()
+              payload = AESGCM(key).decrypt(encrypted[:12], encrypted[12:],
+                                           b'goblin-protected-build-v1:' + source_sha.encode('ascii'))
+              for name in list(os.environ):
+                  if name.startswith('GOBLIN_BUILD_'):
+                      del os.environ[name]
+              del key, encrypted, chunks
+              with tempfile.TemporaryDirectory(prefix='goblin-private-', dir=runner) as folder:
+                  private = Path(folder)
+                  root = private / 'source'
+                  root.mkdir()
+                  with zipfile.ZipFile(io.BytesIO(payload)) as archive:
+                      entries = archive.infolist()
+                      names = [entry.filename for entry in entries]
+                      if set(names) != allowed or len(names) != len(set(names)):
+                          raise ValueError()
+                      if sum(entry.file_size for entry in entries) > 10 * 1024 * 1024:
+                          raise ValueError()
+                      for entry in entries:
+                          path = PurePosixPath(entry.filename)
+                          if path.is_absolute() or '..' in path.parts or '\\' in entry.filename:
+                              raise ValueError()
+                          if stat.S_ISLNK(entry.external_attr >> 16) or entry.is_dir():
+                              raise ValueError()
+                          destination = root.joinpath(*path.parts)
+                          destination.parent.mkdir(parents=True, exist_ok=True)
+                          destination.write_bytes(archive.read(entry))
+                  del payload
+                  shutil.copytree(checkout / 'goblin' / 'static', root / 'static')
+                  with (private / 'private.log').open('wb') as log:
+                      def run(*arguments):
+                          subprocess.run(arguments, cwd=root, env=dict(os.environ),
+                                         stdout=log, stderr=log, check=True)
+                      phase = 'dependencies'
+                      run(sys.executable, 'install_build_dependencies.py')
+                      phase = 'compile'
+                      run(sys.executable, 'build_release.py')
+                      wheels = list((root / 'dist').glob('*.whl'))
+                      if len(wheels) != 1:
+                          raise ValueError()
+                      if os.environ.get('BUILD_ABI'):
+                          phase = 'repair'
+                          run('auditwheel', 'repair', str(wheels[0]), '--plat',
+                              'manylinux_2_28_x86_64', '--wheel-dir', str(root / 'wheelhouse'))
+                          wheels = list((root / 'wheelhouse').glob('*.whl'))
+                      if len(wheels) != 1:
+                          raise ValueError()
+                      wheel = wheels[0]
+                      phase = 'verify'
+                      run(sys.executable, 'verify_wheel.py', str(wheel))
+                      run(sys.executable, '-m', 'twine', 'check', str(wheel))
+                      phase = 'compiled-tests'
+                      run(sys.executable, '-m', 'pip', 'install', '--no-deps', '--force-reinstall', str(wheel))
+                      run(sys.executable, 'run_tests.py', '--compiled')
+                      run(sys.executable, '-c', "import goblin.generator as g; assert hasattr(g, '__compiled__')")
+                  phase = 'export'
+                  output = runner / 'protected-output'
+                  output.mkdir()
+                  shutil.copy2(wheel, output / wheel.name)
+                  digest = hashlib.sha256(wheel.read_bytes()).hexdigest()
+                  (output / 'provenance.json').write_text(json.dumps({
+                      'source_sha': source_sha, 'wheel_sha256': digest,
+                      'target': os.environ['BUILD_TARGET']}) + '\n', encoding='utf-8')
+                  if {file.name for file in output.iterdir()} != {wheel.name, 'provenance.json'}:
+                      raise ValueError()
+          except BaseException:
+              print('Protected build failed at ' + phase + '; private diagnostics withheld.', flush=True)
+              sys.exit(1)
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.target }}
+          path: ${{ runner.temp }}/protected-output/*
+          if-no-files-found: error
+          retention-days: 7
