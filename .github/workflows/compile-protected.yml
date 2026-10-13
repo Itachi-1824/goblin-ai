@@ -90,10 +90,10 @@ jobs:
               'release/docs/server.md', 'release/docs/openapi.json',
               'release/docs/models-and-prompts.md', 'release/docs/index.md',
               'release/docs/getting-started.md', 'release/docs/generation.md',
-              'release/docs/api-reference.md'}
+              'release/docs/api-reference.md',
+              'static/index.html', 'static/app.css', 'static/app.js', 'static/shimmer.gif'}
           phase = 'decrypt'
           try:
-              checkout = Path(os.environ['GITHUB_WORKSPACE']).resolve()
               runner = Path(os.environ['RUNNER_TEMP']).resolve()
               source_sha = os.environ['GOBLIN_BUILD_SOURCE_SHA']
               if not re.fullmatch(r'[0-9a-f]{40}', source_sha):
@@ -132,7 +132,6 @@ jobs:
                           destination.parent.mkdir(parents=True, exist_ok=True)
                           destination.write_bytes(archive.read(entry))
                   del payload
-                  shutil.copytree(checkout / 'goblin' / 'static', root / 'static')
                   with (private / 'private.log').open('wb') as log:
                       def run(*arguments):
                           subprocess.run(arguments, cwd=root, env=dict(os.environ),
