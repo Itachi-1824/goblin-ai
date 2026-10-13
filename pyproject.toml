@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "goblin-ai"
-version = "2.1.0"
+version = "2.1.1"
 description = "AI image generation with protected native modules and local upscaling"
 readme = "README.md"
 license = "LicenseRef-Proprietary"

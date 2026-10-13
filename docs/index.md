@@ -1,6 +1,6 @@
 # Goblin documentation
 
-These guides describe Goblin AI 2.1.0. The implementation is compiled; the examples, API reference and HTTP schema explain the supported interface without requiring implementation source.
+These guides describe Goblin AI 2.1.1. The implementation is compiled; the examples, API reference and HTTP schema explain the supported interface without requiring implementation source.
 
 | Start here | What you will learn |
 |---|---|

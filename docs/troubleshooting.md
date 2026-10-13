@@ -2,7 +2,7 @@
 
 | Symptom | Check/action |
 |---|---|
-| No matching wheel or native module import failure | Check CPython version, OS and architecture. Use the matching 2.1.0 wheel; do not copy native modules between Python versions. |
+| No matching wheel or native module import failure | Check CPython version, OS and architecture. Use the matching 2.1.1 wheel; do not copy native modules between Python versions. |
 | First use takes longer | First-use runtime setup and downloads can add latency. Prefetch browser data with `python -m camoufox fetch`. |
 | Generation fails | Confirm network access and upstream availability, then retry in a clean application lifecycle. Use `Goblin(verbose=True)` for SDK diagnostics. |
 | Server says initializing | Poll `/health`; generation returns 503 until initialization succeeds. |
