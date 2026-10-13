@@ -1,4 +1,25 @@
-# Goblin AI
+<div align="center">
+
+# 🎨 Goblin AI
+
+### Image generation from Python or a local browser interface
+
+[![PyPI version](https://img.shields.io/pypi/v/goblin-ai?color=blue&label=PyPI)](https://pypi.org/project/goblin-ai/)
+[![Python](https://img.shields.io/pypi/pyversions/goblin-ai?color=green)](https://pypi.org/project/goblin-ai/)
+[![Downloads](https://img.shields.io/pypi/dm/goblin-ai?color=orange)](https://pypi.org/project/goblin-ai/)
+[![License](https://img.shields.io/badge/license-Proprietary-red)](https://github.com/Itachi-1824/goblin-ai/blob/main/LICENSE)
+
+<br>
+
+<img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=28&duration=3000&pause=1000&color=9B59B6&center=true&vCenter=true&width=500&lines=Generate+anything...;Anime+%F0%9F%8C%B8;Portraits+%F0%9F%93%B7;Fantasy+%F0%9F%90%89;Cyberpunk+%F0%9F%8C%83;Pixel+Art+%F0%9F%8E%AE" alt="Goblin image styles" />
+
+<br>
+
+[**Install**](#install) · [**Generate**](#generate) · [**Server and UI**](#server-and-ui)
+
+</div>
+
+---
 
 Generate AI images from Python or a local browser interface, with optional CPU/GPU upscaling. No account or personal API key is needed for ordinary use. First use performs setup; later calls reuse a managed session.
 

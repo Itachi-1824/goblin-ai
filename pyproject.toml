@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "goblin-ai"
-version = "2.1.1"
+version = "2.1.2"
 description = "AI image generation with protected native modules and local upscaling"
 readme = "README.md"
 license = "LicenseRef-Proprietary"
@@ -49,4 +49,4 @@ packages = ["goblin"]
 include-package-data = false
 
 [tool.setuptools.package-data]
-goblin = ["static/*.html", "static/*.gif"]
+goblin = ["static/index.html", "static/app.css", "static/app.js", "static/shimmer.gif"]

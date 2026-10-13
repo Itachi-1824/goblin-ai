@@ -98,13 +98,14 @@ jobs:
                           metadata.append(BytesParser().parsebytes(archive.read(name)))
                       continue
                   if len(path.parts) == 3 and path.parts[:2] == ('goblin', 'static'):
-                      assert path.suffix in {'.html', '.gif'}
+                      assert path.name in {'index.html', 'app.css', 'app.js', 'shimmer.gif'}
                       continue
                   assert len(path.parts) == 2 and path.parts[0] == 'goblin', name
                   matches = [module for module in modules if any(path.name == module + suffix for suffix in importlib.machinery.EXTENSION_SUFFIXES)]
                   assert len(matches) == 1 and matches[0] not in native, name
                   native.add(matches[0])
               assert native == modules, 'Incomplete native package'
+              assert {name for name in files if name.startswith('goblin/static/')} == {'goblin/static/' + name for name in ['index.html', 'app.css', 'app.js', 'shimmer.gif']}, 'Incomplete UI assets'
               assert len(metadata) == 1
               assert metadata[0]['Name'] == 'goblin-ai' and metadata[0]['Version'] == expected
       - name: Check distribution
@@ -121,10 +122,15 @@ jobs:
           smoke = '''
           import importlib
           import importlib.metadata
+          from pathlib import Path
           import goblin
           for name in ['_cli', '_core', '_guard', 'auto_map', 'easy', 'generator', 'models', 'parameters', 'pool', 'prompts', 'server', 'upscaler', 'web']:
               assert hasattr(importlib.import_module('goblin.' + name), '__compiled__'), name
           assert goblin.__version__ == importlib.metadata.version('goblin-ai')
+          assert goblin.create_app().version == goblin.__version__
+          assert goblin.create_app().openapi()['info']['version'] == goblin.__version__
+          static = Path(goblin.__file__).parent / 'static'
+          assert {path.name for path in static.iterdir()} == {'index.html', 'app.css', 'app.js', 'shimmer.gif'}
           assert goblin.get_device_info()['recommended_preset'] == 'fast'
           '''
           with tempfile.TemporaryDirectory() as cwd:

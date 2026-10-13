@@ -1,6 +1,6 @@
 include README.md LICENSE MODEL_LICENSES.md pyproject.toml setup.py
 include goblin/__init__.py goblin/__main__.py
 recursive-include goblin/_native *.pyd *.so
-recursive-include goblin/static *.html *.gif
+include goblin/static/index.html goblin/static/app.css goblin/static/app.js goblin/static/shimmer.gif
 recursive-exclude * __pycache__
 global-exclude *.pyc *.pyo *.pyi *.pyx *.c *.h *.pdb *.xml *.onnx
