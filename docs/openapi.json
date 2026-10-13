@@ -3,7 +3,7 @@
   "info": {
     "title": "Goblin Image API",
     "description": "Free AI image generation with 50+ models, prompt enhancement, and random prompt generator",
-    "version": "2.1.1"
+    "version": "2.1.2"
   },
   "paths": {
     "/": {
@@ -73,6 +73,7 @@
     "/device": {
       "get": {
         "summary": "Device Info",
+        "description": "Get hardware info for upscaling (GPU provider, RAM, tile size)",
         "operationId": "device_info_device_get",
         "responses": {
           "200": {
@@ -227,6 +228,7 @@
     "/upscale/presets": {
       "get": {
         "summary": "Get Upscale Presets",
+        "description": "List available upscale presets",
         "operationId": "get_upscale_presets_upscale_presets_get",
         "responses": {
           "200": {
@@ -243,6 +245,7 @@
     "/upscale/models": {
       "get": {
         "summary": "Get Upscale Models",
+        "description": "List all available upscaling models with download status",
         "operationId": "get_upscale_models_upscale_models_get",
         "responses": {
           "200": {
@@ -256,9 +259,58 @@
         }
       }
     },
+    "/upscale/models/{model_id}/download": {
+      "post": {
+        "summary": "Download Upscale Model",
+        "description": "Download or verify a curated, SHA-pinned upscaling model.",
+        "operationId": "download_upscale_model_upscale_models__model_id__download_post",
+        "parameters": [
+          {
+            "name": "model_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Model Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ModelDownloadRequestModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/upscale": {
       "post": {
         "summary": "Upscale Image",
+        "description": "Upscale an image using preset or specific model.\n\nUse 'preset' for easy quality selection, or 'model' for specific model.\nPresets: fast, balanced, quality, best, photo, anime, sharp, ultra",
         "operationId": "upscale_image_upscale_post",
         "requestBody": {
           "content": {
@@ -295,6 +347,7 @@
     "/upscale/raw": {
       "post": {
         "summary": "Upscale Image Raw",
+        "description": "Upscale and return raw image bytes (not base64)",
         "operationId": "upscale_image_raw_upscale_raw_post",
         "requestBody": {
           "content": {
@@ -331,6 +384,7 @@
     "/upscale/ultra": {
       "post": {
         "summary": "Upscale Ultra Endpoint",
+        "description": "Ultra quality upscale pipeline: Resize -> Restore -> Upscale -> PNG\n\nChains multiple models for maximum quality:\n1. Smart resize to optimal pre-upscale size\n2. Run restoration model to fix artifacts\n3. Run 4x upscale model with AI detail enhancement\n4. Output as PNG (lossless) or high-quality JPG",
         "operationId": "upscale_ultra_endpoint_upscale_ultra_post",
         "requestBody": {
           "content": {
@@ -367,6 +421,7 @@
     "/upscale/ultra/test": {
       "get": {
         "summary": "Test Ultra Pipeline",
+        "description": "Test endpoint to check ultra pipeline status and logs",
         "operationId": "test_ultra_pipeline_upscale_ultra_test_get",
         "responses": {
           "200": {
@@ -1343,6 +1398,21 @@
         "type": "object",
         "title": "HTTPValidationError"
       },
+      "ModelDownloadRequestModel": {
+        "properties": {
+          "confirm": {
+            "type": "boolean",
+            "title": "Confirm",
+            "description": "Explicitly confirm model weight download"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "confirm"
+        ],
+        "title": "ModelDownloadRequestModel"
+      },
       "UltraUpscaleRequestModel": {
         "properties": {
           "image_base64": {
@@ -1396,7 +1466,8 @@
           "width",
           "height"
         ],
-        "title": "UltraUpscaleRequestModel"
+        "title": "UltraUpscaleRequestModel",
+        "description": "Request model for ultra quality upscaling pipeline"
       },
       "UpscaleRequestModel": {
         "properties": {
@@ -1452,7 +1523,8 @@
           "width",
           "height"
         ],
-        "title": "UpscaleRequestModel"
+        "title": "UpscaleRequestModel",
+        "description": "Request model for image upscaling"
       },
       "ValidationError": {
         "properties": {

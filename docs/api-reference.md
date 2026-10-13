@@ -1,6 +1,6 @@
 # Complete Python API reference
 
-Reference for Goblin 2.1.1. All 67 names in `goblin.__all__` are listed below. Import them from `goblin` unless a submodule is explicitly shown.
+Reference for Goblin 2.1.2. All 67 names in `goblin.__all__` are listed below. Import them from `goblin` unless a submodule is explicitly shown.
 
 Signatures describe the supported public interface. `Optional`, `Union` and `Callable` below use their normal Python typing meanings. Async functions must be awaited. See the guides for behavior, errors and compatibility fields.
 

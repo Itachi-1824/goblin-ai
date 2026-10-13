@@ -57,6 +57,14 @@ python -m camoufox fetch
 
 Run this in the same environment as Goblin. Linux installations may also require the browser's system libraries; follow [Camoufox's installation instructions](https://camoufox.com/python/installation/).
 
+To use the browser interface instead of writing a script:
+
+```sh
+goblin ui --port 8000
+```
+
+Wait for Online, enter a prompt and choose a model. Custom dimensions update the canvas immediately. Neural processing presets offer a confirmation dialog for one-time weight downloads; if the backend is missing, the dialog provides CPU/CUDA install commands to run in this same environment before restarting Goblin. Fast resize works with the base install. Browse generated images using gallery arrows, the mouse wheel or touch swipes. Download anything you want to keep: the session gallery clears on refresh and retains at most 24 results within its base64-data limit. Stop waiting ends the browser wait; server work may continue. See [UI and server usage](server.md) for limits and setup details.
+
 Check the installed version and available local processing:
 
 ```python

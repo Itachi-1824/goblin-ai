@@ -14,6 +14,18 @@ python -m goblin --port 8000
 
 For a container, explicitly pass `--host 0.0.0.0`. Use an authenticated reverse proxy before network exposure. Goblin does not provide account authentication. Concurrent callers share the managed provider session's generation slot.
 
+## Use the browser UI
+
+Enter a prompt, choose an image model and a canvas shape, then generate when the server reports Online. Enable **Custom size** to set width and height from 64 to 4096 pixels. The preview canvas changes immediately as you edit valid dimensions; the size shown describes the next output. **Custom-size processing** chooses how the generated image reaches that size. After generation, choose an upscaling preset and use **Upscale 2×** to enlarge the result within the 4096-pixel limit.
+
+Neural presets remain selectable before their weights are cached. Choosing one opens a setup dialog showing the required models and download sizes. Confirm **Download models** to prepare those weights once; presets sharing them reuse the cache. If a neural backend is missing, copy either `python -m pip install "goblin-ai[cpu]"` or `python -m pip install "goblin-ai[gpu]"`, run it in Goblin's environment, then restart Goblin and reload the page. Choose one backend; CUDA also needs a suitable NVIDIA driver. **Use fast resize** continues without a neural backend or model download. Closing setup restores the previous selection.
+
+Open a gallery thumbnail to browse with the previous/next buttons, left/right arrow keys, mouse wheel over the image, or a horizontal touch swipe. Navigation stops at the first and last image. The gallery belongs to this browser page session and keeps at most 24 results, dropping older images when their combined base64 data exceeds 64 MiB. Refreshing or **Clear gallery** clears it. Download images you want to keep; the gallery is not saved to disk.
+
+**Stop waiting** cancels the browser's wait and preserves the previous image. It does not guarantee that server generation, upscaling or a model download stops. Closing model setup during a download has the same limitation; completed weights may remain cached for later use.
+
+## Embed the application
+
 Embed the application:
 
 ```python
@@ -86,6 +98,8 @@ with urlopen(request, timeout=120) as response:
 
 `/upscale` returns base64 JSON; `/upscale/raw` returns image bytes. Use `preset="balanced"` for SPAN with an installed backend, or `model="span-x2"` for a direct model. `/upscale/ultra` accepts optional `restore_model`, `upscale_model` and `output_format` alongside the image and dimensions.
 
+For one-time model setup, inspect `GET /upscale/models`, then call `POST /upscale/models/{model_id}/download` with `Content-Type: application/json` and body `{"confirm":true}`. Missing, false or malformed confirmation returns 400. Only `span`, `span-x2`, `nomos2-mosr`, `nomos2-dat2` and `realplksr-x2` are accepted. Downloads verify the pinned SHA-256 and reuse a verified cached file. Success returns `{"name":"span","downloaded":true,"size_mb":1.64}`; the size is the actual file size in MiB rounded to two decimals. Unsupported IDs return 400; download or verification failures return 503 with a static error message. This endpoint downloads model weights; install inference dependencies separately using the documented package extras.
+
 ## Endpoint map
 
 <!-- endpoint-map -->
@@ -105,6 +119,7 @@ with urlopen(request, timeout=120) as response:
 | GET | `/options/resolutions` | Get Resolutions |
 | GET | `/upscale/presets` | Get Upscale Presets |
 | GET | `/upscale/models` | Get Upscale Models |
+| POST | `/upscale/models/{model_id}/download` | Download Upscale Model |
 | POST | `/upscale` | Upscale Image |
 | POST | `/upscale/raw` | Upscale Image Raw |
 | POST | `/upscale/ultra` | Upscale Ultra Endpoint |
@@ -129,6 +144,8 @@ with urlopen(request, timeout=120) as response:
 <!-- /endpoint-map -->
 
 The generated table lists the installed API surface. `/docs`, `/redoc` and `/openapi.json` are also available. The [checked-in HTTP schema](openapi.json) gives all request fields and query parameters; a running application's schema is authoritative for its installed version. `/session` returns public session capabilities, without connection details.
+
+Browser POST requests are supported from the same loopback origin as the server (`localhost`, `127.0.0.1` or `[::1]`, including its port). Cross-origin browser requests are denied. Python and other API clients without an Origin header remain supported.
 
 ## Limits
 
