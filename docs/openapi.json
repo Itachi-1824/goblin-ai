@@ -1,0 +1,1499 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Goblin Image API",
+    "description": "Free AI image generation with 50+ models, prompt enhancement, and random prompt generator",
+    "version": "2.1.1"
+  },
+  "paths": {
+    "/": {
+      "get": {
+        "summary": "Root",
+        "operationId": "root__get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "summary": "Health",
+        "operationId": "health_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stats": {
+      "get": {
+        "summary": "Stats",
+        "operationId": "stats_stats_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/session": {
+      "get": {
+        "summary": "Get Session Config",
+        "operationId": "get_session_config_session_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/device": {
+      "get": {
+        "summary": "Device Info",
+        "operationId": "device_info_device_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/models": {
+      "get": {
+        "summary": "Get Models",
+        "operationId": "get_models_models_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/models/{model_id}": {
+      "get": {
+        "summary": "Get Model Info",
+        "operationId": "get_model_info_models__model_id__get",
+        "parameters": [
+          {
+            "name": "model_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Model Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/models/{model_id}/styles": {
+      "get": {
+        "summary": "Get Styles For Model",
+        "operationId": "get_styles_for_model_models__model_id__styles_get",
+        "parameters": [
+          {
+            "name": "model_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Model Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/options": {
+      "get": {
+        "summary": "Get All Options",
+        "operationId": "get_all_options_options_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/options/styles": {
+      "get": {
+        "summary": "Get Styles",
+        "operationId": "get_styles_options_styles_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/options/resolutions": {
+      "get": {
+        "summary": "Get Resolutions",
+        "operationId": "get_resolutions_options_resolutions_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/upscale/presets": {
+      "get": {
+        "summary": "Get Upscale Presets",
+        "operationId": "get_upscale_presets_upscale_presets_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/upscale/models": {
+      "get": {
+        "summary": "Get Upscale Models",
+        "operationId": "get_upscale_models_upscale_models_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/upscale": {
+      "post": {
+        "summary": "Upscale Image",
+        "operationId": "upscale_image_upscale_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpscaleRequestModel"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/upscale/raw": {
+      "post": {
+        "summary": "Upscale Image Raw",
+        "operationId": "upscale_image_raw_upscale_raw_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpscaleRequestModel"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/upscale/ultra": {
+      "post": {
+        "summary": "Upscale Ultra Endpoint",
+        "operationId": "upscale_ultra_endpoint_upscale_ultra_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UltraUpscaleRequestModel"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/upscale/ultra/test": {
+      "get": {
+        "summary": "Test Ultra Pipeline",
+        "operationId": "test_ultra_pipeline_upscale_ultra_test_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/generate": {
+      "post": {
+        "summary": "Generate",
+        "operationId": "generate_generate_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenerateRequestModel"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/generate/base64": {
+      "post": {
+        "summary": "Generate Base64",
+        "operationId": "generate_base64_generate_base64_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenerateRequestModel"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/generate/metadata": {
+      "post": {
+        "summary": "Generate With Metadata",
+        "operationId": "generate_with_metadata_generate_metadata_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenerateRequestModel"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/generate/photo": {
+      "post": {
+        "summary": "Generate Photo",
+        "operationId": "generate_photo_generate_photo_post",
+        "parameters": [
+          {
+            "name": "prompt",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Prompt"
+            }
+          },
+          {
+            "name": "camera",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Camera"
+            }
+          },
+          {
+            "name": "lighting",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Lighting"
+            }
+          },
+          {
+            "name": "model",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Model"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/generate/anime": {
+      "post": {
+        "summary": "Generate Anime",
+        "operationId": "generate_anime_generate_anime_post",
+        "parameters": [
+          {
+            "name": "prompt",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Prompt"
+            }
+          },
+          {
+            "name": "style",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Style"
+            }
+          },
+          {
+            "name": "expression",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Expression"
+            }
+          },
+          {
+            "name": "model",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Model"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/generate/portrait": {
+      "post": {
+        "summary": "Generate Portrait",
+        "operationId": "generate_portrait_generate_portrait_post",
+        "parameters": [
+          {
+            "name": "prompt",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Prompt"
+            }
+          },
+          {
+            "name": "expression",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Expression"
+            }
+          },
+          {
+            "name": "model",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Model"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/generate/cinematic": {
+      "post": {
+        "summary": "Generate Cinematic",
+        "operationId": "generate_cinematic_generate_cinematic_post",
+        "parameters": [
+          {
+            "name": "prompt",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Prompt"
+            }
+          },
+          {
+            "name": "model",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Model"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/prompts/random": {
+      "get": {
+        "summary": "Get Random Prompt",
+        "operationId": "get_random_prompt_prompts_random_get",
+        "parameters": [
+          {
+            "name": "category",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "random",
+              "title": "Category"
+            }
+          },
+          {
+            "name": "style",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "random",
+              "title": "Style"
+            }
+          },
+          {
+            "name": "include_quality",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": true,
+              "title": "Include Quality"
+            }
+          },
+          {
+            "name": "include_lighting",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": true,
+              "title": "Include Lighting"
+            }
+          },
+          {
+            "name": "include_environment",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": true,
+              "title": "Include Environment"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/prompts/random/character": {
+      "get": {
+        "summary": "Get Random Character",
+        "operationId": "get_random_character_prompts_random_character_get",
+        "parameters": [
+          {
+            "name": "gender",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "random",
+              "title": "Gender"
+            }
+          },
+          {
+            "name": "fantasy",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": true,
+              "title": "Fantasy"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/prompts/random/landscape": {
+      "get": {
+        "summary": "Get Random Landscape",
+        "operationId": "get_random_landscape_prompts_random_landscape_get",
+        "parameters": [
+          {
+            "name": "time",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "random",
+              "title": "Time"
+            }
+          },
+          {
+            "name": "weather",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "random",
+              "title": "Weather"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/prompts/random/anime": {
+      "get": {
+        "summary": "Get Random Anime",
+        "operationId": "get_random_anime_prompts_random_anime_get",
+        "parameters": [
+          {
+            "name": "style",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "random",
+              "title": "Style"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/prompts/variations": {
+      "post": {
+        "summary": "Get Prompt Variations",
+        "operationId": "get_prompt_variations_prompts_variations_post",
+        "parameters": [
+          {
+            "name": "prompt",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 4000,
+              "title": "Prompt"
+            }
+          },
+          {
+            "name": "count",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 10,
+              "minimum": 1,
+              "default": 4,
+              "title": "Count"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/prompts/categories": {
+      "get": {
+        "summary": "Get Prompt Categories",
+        "operationId": "get_prompt_categories_prompts_categories_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/prompts/art-styles": {
+      "get": {
+        "summary": "Get Art Styles",
+        "operationId": "get_art_styles_prompts_art_styles_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/prompts/environments": {
+      "get": {
+        "summary": "Get Environments",
+        "operationId": "get_environments_prompts_environments_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/generate/random": {
+      "post": {
+        "summary": "Generate Random Image",
+        "operationId": "generate_random_image_generate_random_post",
+        "parameters": [
+          {
+            "name": "category",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "random",
+              "title": "Category"
+            }
+          },
+          {
+            "name": "style",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "random",
+              "title": "Style"
+            }
+          },
+          {
+            "name": "model",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Model"
+            }
+          },
+          {
+            "name": "shape",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Shape"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "GenerateRequestModel": {
+        "properties": {
+          "prompt": {
+            "type": "string",
+            "maxLength": 4000,
+            "minLength": 1,
+            "title": "Prompt",
+            "description": "Text description"
+          },
+          "negative_prompt": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Negative Prompt",
+            "description": "Things to avoid",
+            "default": ""
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          },
+          "shape": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Shape"
+          },
+          "seed": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Seed",
+            "default": -1
+          },
+          "guidance_scale": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 30.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Guidance Scale"
+          },
+          "style": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Style"
+          },
+          "quality": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Quality"
+          },
+          "lighting": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lighting"
+          },
+          "camera": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Camera"
+          },
+          "composition": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Composition"
+          },
+          "expression": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expression"
+          },
+          "style_strength": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 1.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Style Strength",
+            "default": 1.0
+          },
+          "remove_background": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Remove Background",
+            "default": false
+          },
+          "width": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 4096.0,
+                "minimum": 64.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Width",
+            "description": "Target width (64-4096)"
+          },
+          "height": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 4096.0,
+                "minimum": 64.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Height",
+            "description": "Target height (64-4096)"
+          },
+          "upscale_preset": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Upscale Preset",
+            "description": "Upscale preset: auto, fast, balanced, quality, best, photo, anime, sharp, ultra",
+            "default": "auto"
+          },
+          "upscale_strategy": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Upscale Strategy",
+            "description": "Legacy: use upscale_preset instead"
+          },
+          "user_key": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "User Key",
+            "description": "Client-provided session key"
+          }
+        },
+        "type": "object",
+        "required": [
+          "prompt"
+        ],
+        "title": "GenerateRequestModel"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "UltraUpscaleRequestModel": {
+        "properties": {
+          "image_base64": {
+            "type": "string",
+            "maxLength": 33554432,
+            "title": "Image Base64",
+            "description": "Base64 encoded image data"
+          },
+          "width": {
+            "type": "integer",
+            "maximum": 4096.0,
+            "minimum": 64.0,
+            "title": "Width",
+            "description": "Target width (64-4096)"
+          },
+          "height": {
+            "type": "integer",
+            "maximum": 4096.0,
+            "minimum": 64.0,
+            "title": "Height",
+            "description": "Target height (64-4096)"
+          },
+          "restore_model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Restore Model",
+            "description": "Optional 1x restoration model: restore-1x, nafnet"
+          },
+          "upscale_model": {
+            "type": "string",
+            "title": "Upscale Model",
+            "description": "4x upscale model: nomos2-mosr, nomos2-dat2, etc.",
+            "default": "nomos2-mosr"
+          },
+          "output_format": {
+            "type": "string",
+            "title": "Output Format",
+            "description": "Output format: png (lossless) or jpg",
+            "default": "png"
+          }
+        },
+        "type": "object",
+        "required": [
+          "image_base64",
+          "width",
+          "height"
+        ],
+        "title": "UltraUpscaleRequestModel"
+      },
+      "UpscaleRequestModel": {
+        "properties": {
+          "image_base64": {
+            "type": "string",
+            "maxLength": 33554432,
+            "title": "Image Base64",
+            "description": "Base64 encoded image data"
+          },
+          "width": {
+            "type": "integer",
+            "maximum": 4096.0,
+            "minimum": 64.0,
+            "title": "Width",
+            "description": "Target width (64-4096)"
+          },
+          "height": {
+            "type": "integer",
+            "maximum": 4096.0,
+            "minimum": 64.0,
+            "title": "Height",
+            "description": "Target height (64-4096)"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model",
+            "description": "Upscale model: lanczos, bicubic, realesrgan-x4v3, remacri, ultrasharp, etc."
+          },
+          "preset": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Preset",
+            "description": "Upscale preset: auto, fast, balanced, quality, best, photo, anime, sharp, ultra",
+            "default": "auto"
+          }
+        },
+        "type": "object",
+        "required": [
+          "image_base64",
+          "width",
+          "height"
+        ],
+        "title": "UpscaleRequestModel"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    }
+  }
+}

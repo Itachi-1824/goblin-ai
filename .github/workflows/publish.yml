@@ -1,0 +1,190 @@
+name: Publish protected wheels
+on:
+  pull_request:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: publish-${{ github.ref }}
+  cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/') }}
+jobs:
+  wheels:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2022, macos-15, macos-15-intel]
+        python: ['3.11', '3.12', '3.13', '3.14']
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Check release version
+        shell: python
+        run: |
+          import os
+          import tomllib
+          from pathlib import Path
+          version = tomllib.loads(Path('pyproject.toml').read_text())['project']['version']
+          if os.environ['GITHUB_REF'].startswith('refs/tags/'):
+              assert os.environ['GITHUB_REF_NAME'] == 'v' + version, 'Tag does not match package version'
+      - name: Install wheel tools
+        run: python -m pip install build twine
+      - name: Package existing native modules
+        run: python -m build --wheel --outdir raw-dist
+      - name: Repair Linux wheel
+        if: runner.os == 'Linux'
+        shell: python
+        run: |
+          import subprocess
+          import sys
+          from pathlib import Path
+          subprocess.run([sys.executable, '-m', 'pip', 'install', 'auditwheel', 'patchelf'], check=True)
+          wheel, = Path('raw-dist').glob('*.whl')
+          subprocess.run([sys.executable, '-m', 'auditwheel', 'repair', '--plat', 'manylinux_2_28_x86_64', '--wheel-dir', 'dist', str(wheel)], check=True)
+      - name: Select desktop wheel
+        if: runner.os != 'Linux'
+        shell: python
+        run: |
+          import shutil
+          from pathlib import Path
+          Path('dist').mkdir()
+          wheel, = Path('raw-dist').glob('*.whl')
+          shutil.copy2(wheel, 'dist')
+      - name: Verify wheel contents and metadata
+        shell: python
+        run: |
+          import importlib.machinery
+          import os
+          import sys
+          import tomllib
+          import zipfile
+          from email.parser import BytesParser
+          from pathlib import Path, PurePosixPath
+          from packaging.tags import sys_tags
+          from packaging.utils import parse_wheel_filename
+          from packaging.version import Version
+          modules = {'_cli', '_core', '_guard', 'auto_map', 'easy', 'generator', 'models', 'parameters', 'pool', 'prompts', 'server', 'upscaler', 'web'}
+          wheel, = Path('dist').glob('*.whl')
+          name, version, _, tags = parse_wheel_filename(wheel.name)
+          expected = tomllib.loads(Path('pyproject.toml').read_text())['project']['version']
+          assert name == 'goblin-ai' and version == Version(expected)
+          assert tags & set(sys_tags()), 'Wheel cannot be installed on this runner'
+          abi = f'cp{sys.version_info.major}{sys.version_info.minor}'
+          assert all(tag.interpreter == abi and tag.abi == abi for tag in tags)
+          if sys.platform == 'linux':
+              assert any(tag.platform == 'manylinux_2_28_x86_64' for tag in tags)
+              assert all(tag.platform.startswith('manylinux') for tag in tags)
+          with zipfile.ZipFile(wheel) as archive:
+              files = [name for name in archive.namelist() if not name.endswith('/')]
+              assert len(files) == len(set(files)), 'Duplicate archive paths'
+              loaders = {'goblin/__init__.py', 'goblin/__main__.py'}
+              assert {name for name in files if name.endswith('.py')} == loaders
+              native = set()
+              metadata = []
+              for name in files:
+                  path = PurePosixPath(name)
+                  assert not path.is_absolute() and '..' not in path.parts
+                  if name in loaders:
+                      continue
+                  if len(path.parts) >= 2 and path.parts[0].endswith('.dist-info'):
+                      assert path.parts[0] == f'goblin_ai-{expected}.dist-info'
+                      assert (len(path.parts) == 2 and path.name in {'METADATA', 'WHEEL', 'RECORD', 'entry_points.txt', 'top_level.txt'}) or (len(path.parts) == 3 and path.parts[1] == 'licenses' and path.name in {'LICENSE', 'MODEL_LICENSES.md'}), name
+                      if path.name == 'METADATA':
+                          metadata.append(BytesParser().parsebytes(archive.read(name)))
+                      continue
+                  if len(path.parts) == 3 and path.parts[:2] == ('goblin', 'static'):
+                      assert path.suffix in {'.html', '.gif'}
+                      continue
+                  assert len(path.parts) == 2 and path.parts[0] == 'goblin', name
+                  matches = [module for module in modules if any(path.name == module + suffix for suffix in importlib.machinery.EXTENSION_SUFFIXES)]
+                  assert len(matches) == 1 and matches[0] not in native, name
+                  native.add(matches[0])
+              assert native == modules, 'Incomplete native package'
+              assert len(metadata) == 1
+              assert metadata[0]['Name'] == 'goblin-ai' and metadata[0]['Version'] == expected
+      - name: Check distribution
+        run: python -m twine check --strict dist/*
+      - name: Install and smoke test wheel
+        shell: python
+        run: |
+          import subprocess
+          import sys
+          import tempfile
+          from pathlib import Path
+          wheel, = Path('dist').glob('*.whl')
+          subprocess.run([sys.executable, '-m', 'pip', 'install', str(wheel.resolve())], check=True)
+          smoke = '''
+          import importlib
+          import importlib.metadata
+          import goblin
+          for name in ['_cli', '_core', '_guard', 'auto_map', 'easy', 'generator', 'models', 'parameters', 'pool', 'prompts', 'server', 'upscaler', 'web']:
+              assert hasattr(importlib.import_module('goblin.' + name), '__compiled__'), name
+          assert goblin.__version__ == importlib.metadata.version('goblin-ai')
+          assert goblin.get_device_info()['recommended_preset'] == 'fast'
+          '''
+          with tempfile.TemporaryDirectory() as cwd:
+              subprocess.run([sys.executable, '-I', '-c', smoke], cwd=cwd, check=True)
+              subprocess.run([sys.executable, '-I', '-m', 'goblin', '--version'], cwd=cwd, check=True)
+              subprocess.run(['goblin', '--version'], cwd=cwd, check=True)
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wheel-${{ matrix.os }}-${{ matrix.python }}
+          path: dist/*.whl
+          if-no-files-found: error
+  publish:
+    needs: wheels
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: wheel-*
+          merge-multiple: true
+          path: dist
+      - run: python -m pip install twine packaging
+      - name: Require complete release matrix
+        shell: python
+        run: |
+          import os
+          from pathlib import Path
+          from packaging.utils import parse_wheel_filename
+          from packaging.version import Version
+          wheels = list(Path('dist').glob('*.whl'))
+          assert len(wheels) == 16, 'Release requires all 16 wheels'
+          expected = {(abi, platform) for abi in ['cp311', 'cp312', 'cp313', 'cp314'] for platform in ['windows', 'linux', 'macos-x86_64', 'macos-arm64']}
+          actual = set()
+          for wheel in wheels:
+              name, version, _, tags = parse_wheel_filename(wheel.name)
+              assert name == 'goblin-ai' and version == Version(os.environ['GITHUB_REF_NAME'][1:])
+              identities = set()
+              for tag in tags:
+                  assert tag.interpreter == tag.abi
+                  if tag.platform == 'win_amd64':
+                      platform = 'windows'
+                  elif tag.platform.startswith('manylinux') and tag.platform.endswith('_x86_64'):
+                      platform = 'linux'
+                  elif tag.platform.startswith('macosx_') and tag.platform.endswith('_x86_64'):
+                      platform = 'macos-x86_64'
+                  elif tag.platform.startswith('macosx_') and tag.platform.endswith('_arm64'):
+                      platform = 'macos-arm64'
+                  else:
+                      raise AssertionError('Unexpected wheel platform')
+                  identities.add((tag.interpreter, platform))
+              assert len(identities) == 1 and not (identities & actual), 'Duplicate wheel target'
+              actual.update(identities)
+          assert actual == expected, 'Incomplete release matrix'
+      - run: python -m twine check --strict dist/*
+      - name: Publish all wheels
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
+        run: python -m twine upload --non-interactive dist/*

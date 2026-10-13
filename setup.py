@@ -1,64 +1,44 @@
-"""
-Goblin - Setup script for Cython compilation
-"""
-import os
+import importlib.machinery
+import platform
 import sys
-from setuptools import setup, Extension
+from pathlib import Path
 
-# Check if we're building with Cython
-try:
-    from Cython.Build import cythonize
-    from Cython.Distutils import build_ext
-    USE_CYTHON = True
-except ImportError:
-    USE_CYTHON = False
+from setuptools import Distribution, setup
+from setuptools.command.bdist_wheel import bdist_wheel
+from setuptools.command.build_py import build_py
 
-# Modules to compile
-CYTHON_MODULES = [
-    "goblin/_guard.py",
-    "goblin/_core.py",
-    "goblin/generator.py",
-    "goblin/models.py",
-    "goblin/parameters.py",
-    "goblin/server.py",
-]
+MODULES = {"_cli", "_core", "_guard", "auto_map", "easy", "generator", "models",
+           "parameters", "pool", "prompts", "server", "upscaler", "web"}
+machine = platform.machine().lower()
+machine = {"amd64": "x86_64", "aarch64": "arm64"}.get(machine, machine)
+abi = f"cp{sys.version_info.major}{sys.version_info.minor}"
+native = Path(__file__).parent / "goblin" / "_native" / f"{sys.platform}-{machine}" / abi
 
-# Cython compiler directives
-COMPILER_DIRECTIVES = {
-    'language_level': "3",
-    'always_allow_keywords': True,
-    'annotation_typing': False,
-    'emit_code_comments': False,
-    'embedsignature': False,
-}
 
-def get_extensions():
-    """Get extension modules for compilation"""
-    if not USE_CYTHON:
-        return []
+class BinaryDistribution(Distribution):
+    def has_ext_modules(self):
+        return True
 
-    existing = [m for m in CYTHON_MODULES if os.path.exists(m)]
-    if not existing:
-        return []
 
-    return cythonize(
-        existing,
-        compiler_directives=COMPILER_DIRECTIVES,
-        nthreads=4,
-        quiet=False,
-    )
-
-# Clean up .c files after build
-class CleanBuildExt(build_ext if USE_CYTHON else object):
+class BinaryBuild(build_py):
     def run(self):
+        if sys.implementation.name != "cpython":
+            raise RuntimeError("Goblin requires CPython")
         super().run()
-        # Remove generated .c files
-        for module in CYTHON_MODULES:
-            c_file = module.replace('.py', '.c')
-            if os.path.exists(c_file):
-                os.remove(c_file)
+        for module in sorted(MODULES):
+            files = [native / (module + suffix) for suffix in importlib.machinery.EXTENSION_SUFFIXES]
+            files = [file for file in files if file.is_file()]
+            if len(files) != 1:
+                raise RuntimeError(f"A compatible native module is missing: {module}")
+            self.copy_file(str(files[0]), str(Path(self.build_lib) / "goblin" / files[0].name))
 
-setup(
-    ext_modules=get_extensions(),
-    cmdclass={'build_ext': CleanBuildExt} if USE_CYTHON else {},
-)
+
+class BinaryWheel(bdist_wheel):
+    def get_tag(self):
+        interpreter, abi_tag, platform_tag = super().get_tag()
+        if sys.platform == "darwin" and platform_tag.endswith("_universal2"):
+            platform_tag = platform_tag.removesuffix("universal2") + machine
+        return interpreter, abi_tag, platform_tag
+
+
+setup(distclass=BinaryDistribution, cmdclass={"build_py": BinaryBuild, "bdist_wheel": BinaryWheel})

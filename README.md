@@ -1,313 +1,101 @@
-<div align="center">
+# Goblin AI
 
-# 🎨 Goblin AI
+Generate AI images from Python or a local browser interface, with optional CPU/GPU upscaling. No account or personal API key is needed for ordinary use. First use performs setup; later calls reuse a managed session.
 
-### ✨ Unlimited Free AI Image Generation ✨
+**[Read the documentation](https://github.com/Itachi-1824/goblin-ai/blob/main/docs/index.md)** · [Complete Python API](https://github.com/Itachi-1824/goblin-ai/blob/main/docs/api-reference.md) · [HTTP API](https://github.com/Itachi-1824/goblin-ai/blob/main/docs/server.md) · [Troubleshooting](https://github.com/Itachi-1824/goblin-ai/blob/main/docs/troubleshooting.md)
 
-**No sign-up. No API keys. No limits. Just art.**
+## Install
 
-[![PyPI version](https://img.shields.io/pypi/v/goblin-ai?color=blue&label=PyPI)](https://pypi.org/project/goblin-ai/)
-[![Python](https://img.shields.io/pypi/pyversions/goblin-ai?color=green)](https://pypi.org/project/goblin-ai/)
-[![Downloads](https://img.shields.io/pypi/dm/goblin-ai?color=orange)](https://pypi.org/project/goblin-ai/)
-[![License](https://img.shields.io/badge/license-Proprietary-red)](LICENSE)
+Use **CPython 3.11–3.14** with a wheel matching your OS and architecture. Release targets are Windows/Linux x86-64 and macOS Intel/Apple Silicon. PyPy and other Python ABIs are unsupported.
 
-<br>
-
-<img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=28&duration=3000&pause=1000&color=9B59B6&center=true&vCenter=true&width=500&lines=Generate+anything...;Anime+%F0%9F%8C%B8;Portraits+%F0%9F%93%B7;Fantasy+%F0%9F%90%89;Cyberpunk+%F0%9F%8C%83;Pixel+Art+%F0%9F%8E%AE" alt="Typing SVG" />
-
-<br>
-
-[**Get Started**](#-quick-start) • [**Models**](#-30-models) • [**API**](#-simple-api) • [**Server**](#-run-as-server)
-
-</div>
-
----
-
-## 🚀 Installation
-
-```bash
+```sh
 pip install goblin-ai
 ```
 
-**With upscaling superpowers:**
-```bash
-pip install goblin-ai[all]  # Real-ESRGAN + FSRCNN neural upscaling
+The base install includes generation, prompt tools, PNG enhancement, interpolation, CLI, UI and HTTP API. Install one AI inference backend for neural upscaling:
+
+```sh
+pip install "goblin-ai[cpu]"
+# Or, in a separate environment for NVIDIA CUDA:
+pip install "goblin-ai[gpu]"
 ```
 
-### 💻 System Requirements
+On Intel macOS with CPython 3.14, the base install works, but the CPU neural extra has no compatible ONNX Runtime wheel. Use CPython 3.13 for neural upscaling on Intel macOS, or use another supported platform.
 
-| Resolution | CPU | GPU (Optional) |
-|------------|-----|----------------|
-| Up to 768px | Any modern CPU | Not required |
-| Up to 1024px | Any modern CPU | Any GPU with 2GB+ VRAM |
-| 1024px - 2048px | i5/Ryzen 5+ | **GTX 1650** or higher recommended |
-| 2048px - 4096px | i7/Ryzen 7+ | **GTX 1660** or RTX series recommended |
+Choose CPU or GPU, rather than installing both runtimes in the same environment. The `quality`, `best` and `all` extras remain CPU aliases; they no longer install the old PyTorch/BasicSR stack. Models download on their first explicit use and are cached in the user's cache directory. `GOBLIN_MODEL_DIR` can select another writable cache directory.
 
-> **Note:** GPU acceleration (CUDA/DirectML) is optional but highly recommended for high-resolution upscaling. Without GPU, images >1024px may be slow on CPU.
+See [installation and first image](https://github.com/Itachi-1824/goblin-ai/blob/main/docs/getting-started.md) for environment setup and device verification.
 
----
-
-## ⚡ Quick Start
+## Generate
 
 ```python
 import asyncio
-from goblin import generate
+from goblin import generate, close
 
 async def main():
-    # 🎯 One-liner - model auto-selected from prompt
-    await generate("a cute anime girl", output="anime.png")
-
-    # 📸 Realistic portrait
-    await generate("professional headshot, studio lighting", output="portrait.png")
-
-    # 🐉 Fantasy art with specific model
-    await generate("epic dragon", model="goblin-fantasy", output="dragon.png")
+    try:
+        image = await generate("a red ceramic teapot", model="goblin-flux", output="teapot.png")
+        print(f"Saved {len(image)} bytes")
+    finally:
+        await close()
 
 asyncio.run(main())
 ```
 
-**That's it.** No API keys. No accounts. No BS.
+`generate()` returns image bytes. Use `enhance_output=False` to keep the provider's original bytes. Model aliases include `goblin-flux`, `goblin-anime`, `goblin-realistic` and `goblin-sd`; use `list_models()` for the catalog.
 
----
+Default enhanced output is PNG at 768×768. Local processing accepts 8-bit grayscale, RGB and RGBA images; PNG output preserves transparency, resizing alpha to match the output dimensions. Set `width` and `height` for another size. First-use setup, remote queueing and image generation take additional time; session reuse avoids repeating setup.
 
-## 🎭 30+ Models
+## What you can do
 
-<table>
-<tr>
-<td width="33%" valign="top">
+| Feature | Entry points | Guide |
+|---|---|---|
+| Simple/batch generation | `generate`, `generate_batch` | [Generation](https://github.com/Itachi-1824/goblin-ai/blob/main/docs/generation.md) |
+| Explicit lifecycle and metadata | `Goblin`, `GenerateRequest` | [Advanced generation](https://github.com/Itachi-1824/goblin-ai/blob/main/docs/generation.md#advanced-lifecycle) |
+| Automatic model selection | `auto_map`, `detect_model` | [Models and prompts](https://github.com/Itachi-1824/goblin-ai/blob/main/docs/models-and-prompts.md) |
+| Catalog discovery and presets | `list_models`, `get_model_*`, preset dictionaries | [Models and prompts](https://github.com/Itachi-1824/goblin-ai/blob/main/docs/models-and-prompts.md) |
+| Local prompt tools | `random_prompt`, `create_variations`, `build_prompt` | [Prompt tools](https://github.com/Itachi-1824/goblin-ai/blob/main/docs/models-and-prompts.md#prompt-utilities) |
+| Resize/neural upscaling | `enhance`, `upscale`, `upscale_default`, `upscale_ultra` | [Upscaling](https://github.com/Itachi-1824/goblin-ai/blob/main/docs/upscaling.md) |
+| Device/cache management | `set_device`, `get_device_info`, `download_model` | [Upscaling](https://github.com/Itachi-1824/goblin-ai/blob/main/docs/upscaling.md#device-selection-and-caching) |
+| CLI, UI and REST API | `goblin server`, `goblin ui`, `create_app` | [Server](https://github.com/Itachi-1824/goblin-ai/blob/main/docs/server.md) |
 
-### 🎨 General
-| Model | Style |
-|-------|-------|
-| `goblin-sd` | All-rounder |
-| `goblin-pro` | Professional |
-| `goblin-flux` | Best text |
-| `goblin-flux-pro` | Enhanced |
-| `goblin-sdxl` | High-res |
+The [API reference](https://github.com/Itachi-1824/goblin-ai/blob/main/docs/api-reference.md) documents every public export, constructor and class method, including argument defaults and return behavior.
 
-</td>
-<td width="33%" valign="top">
+## Upscaling
 
-### 🌸 Anime
-| Model | Style |
-|-------|-------|
-| `goblin-anime` | Classic |
-| `goblin-anime-xl` | Advanced |
-| `goblin-chibi` | Kawaii |
-| `goblin-anime-uncensored` | 18+ |
-
-</td>
-<td width="33%" valign="top">
-
-### 📷 Photo
-| Model | Style |
-|-------|-------|
-| `goblin-realistic` | Photorealistic |
-| `goblin-portrait` | Portraits |
-| `goblin-portrait-hd` | HD |
-| `goblin-photo` | Camera |
-
-</td>
-</tr>
-<tr>
-<td width="33%" valign="top">
-
-### 🖌️ Art Styles
-| Model | Style |
-|-------|-------|
-| `goblin-digital` | Digital art |
-| `goblin-concept` | Concept art |
-| `goblin-fantasy` | Fantasy |
-| `goblin-cyberpunk` | Cyberpunk |
-| `goblin-pixel` | Pixel art |
-| `goblin-oil` | Oil painting |
-
-</td>
-<td width="33%" valign="top">
-
-### 🏔️ Scenes
-| Model | Style |
-|-------|-------|
-| `goblin-landscape` | Nature |
-| `goblin-background` | Wallpapers |
-
-</td>
-<td width="33%" valign="top">
-
-### 🎮 Game Assets
-| Model | Style |
-|-------|-------|
-| `goblin-icon` | App icons |
-| `goblin-sprite` | 2D sprites |
-| `goblin-pokemon` | Creatures |
-| `goblin-character` | Characters |
-| `goblin-furry` | Furry art |
-
-</td>
-</tr>
-</table>
-
----
-
-## 🔧 Simple API
+`upscale_default(image_bytes, width, height, preset="auto")` selects a practical preset. `fast` uses interpolation without a neural model; `balanced` uses compact SPAN, `quality` uses MoSR, `photo` uses 2× RealPLKSR, and `best` uses DAT2. Neural models require a CPU or GPU extra. No single preset is best for every image; see [model attribution](https://github.com/Itachi-1824/goblin-ai/blob/main/MODEL_LICENSES.md) for model origins and attribution.
 
 ```python
-from goblin import generate, detect_model
+from pathlib import Path
+from goblin import upscale_default
 
-# 🤖 Auto model selection
-model = detect_model("1girl anime")  # Returns "goblin-anime"
-
-# 🎛️ Full control
-image = await generate(
-    prompt="beautiful sunset over mountains",
-    model="goblin-landscape",
-    quality="ultra",        # standard | high | ultra | maximum
-    width=1024,
-    height=768,
-    seed=42,                # Reproducible results
-    guidance_scale=7.0      # Prompt adherence (1-30)
-)
+image = Path("teapot.png").read_bytes()
+larger = upscale_default(image, 1536, 1536, preset="auto")
+Path("teapot-large.png").write_bytes(larger)
 ```
 
----
+Automatic processing prioritizes speed. Restoration is opt-in. See the [upscaling guide](https://github.com/Itachi-1824/goblin-ai/blob/main/docs/upscaling.md) for measured timings, direct models, progress callbacks, CPU/GPU selection and cache management.
 
-## 🏗️ Advanced Usage
+## Server and UI
 
-```python
-from goblin import Goblin
-
-async with Goblin() as g:
-    # 🎨 Full parameter control
-    image = await g.generate(
-        prompt="cyberpunk city at night, neon lights, rain",
-        model="goblin-cyberpunk",
-        style="neon",
-        quality="ultra",
-        lighting="dramatic",
-        guidance_scale=7.5
-    )
-
-    # 💾 Save with custom path
-    image.save("cyberpunk_city.png")
-```
-
----
-
-## 🌐 Run as Server
-
-```bash
+```sh
+goblin server --port 8000
+goblin ui --port 8000
 goblin --port 8000
 ```
 
-Then hit the API:
+The legacy flag-only CLI remains supported. The server binds to localhost by default. `/health` reports initialization and readiness; generation returns HTTP 503 while initialization is incomplete, has failed, or the managed session is unavailable. Generation and upscaling requests have resource and per-client request limits. Use an authenticated reverse proxy when exposing the service publicly.
 
-```bash
-curl -X POST http://localhost:8000/generate \
-  -H "Content-Type: application/json" \
-  -d '{"prompt": "a magical forest", "model": "goblin-fantasy"}'
+```sh
+curl -X POST http://127.0.0.1:8000/generate -H "Content-Type: application/json" -d '{"prompt":"a red ceramic teapot","model":"goblin-flux","width":768,"height":768,"upscale_preset":"fast"}' --output teapot.png
 ```
 
----
+Use `curl.exe` in Windows PowerShell when `curl` is an alias. `/docs` provides an interactive HTTP reference; see [all endpoints and request/response examples](https://github.com/Itachi-1824/goblin-ai/blob/main/docs/server.md).
 
-## 📊 Parameters
+## Distribution and support
 
-| Parameter | Description | Default |
-|-----------|-------------|---------|
-| `prompt` | What to generate | *Required* |
-| `model` | Model ID (see above) | Auto-detected |
-| `quality` | `standard` \| `high` \| `ultra` \| `maximum` | `ultra` |
-| `style` | Style preset | `default` |
-| `lighting` | Lighting preset | `auto` |
-| `width` | Image width (64-4096px) | `768` |
-| `height` | Image height (64-4096px) | `768` |
-| `seed` | Random seed (-1 = random) | `-1` |
-| `guidance_scale` | Prompt adherence (1-30) | Model default |
-| `enhance_output` | Smart enhancement pipeline | `True` |
-| `upscale_output` | 4x AI upscaling (slower) | `False` |
+Releases distribute platform-specific compiled wheels, with no source distribution. Compiled modules cannot make reverse engineering impossible.
 
----
+Generation depends on an upstream service. Setup, queueing and network latency can vary, and upstream changes can affect availability.
 
-## 🔬 Upscaling & Enhancement
-
-Goblin includes a powerful AI upscaling system with 24+ models:
-
-```python
-from goblin import generate
-
-# Auto-enhanced output (default) - resize + restore + PNG
-image = await generate("dragon", width=1920, height=1080)
-
-# 4x AI upscaling for maximum quality
-image = await generate("dragon", width=4096, height=4096, upscale_output=True)
-
-# Raw output (no enhancement, JPEG from API)
-image = await generate("dragon", enhance_output=False)
-```
-
-### 🚀 Upscale Performance
-
-| Target Size | GPU (GTX 1650+) | CPU Only |
-|-------------|-----------------|----------|
-| 768px | ~1s | ~3s |
-| 1024px | ~2s | ~8s |
-| 2048px | ~5s | ~30s |
-| 4096px | ~15s | ~2min |
-
-> **Tip:** For images >1024px, a GPU with 4GB+ VRAM provides 5-10x faster upscaling.
-
----
-
-## 🔒 Why Compiled Binaries?
-
-<details>
-<summary><b>Click to learn why this package uses .pyd/.so files</b></summary>
-
-<br>
-
-This package is distributed as compiled binaries instead of plain Python. Here's why:
-
-### 🛡️ Protecting the Free Service
-
-Goblin wraps a free image generation API with rate limits (1 image at a time per user). If source code were public, bad actors could:
-- ❌ Bypass rate limits and overload the service
-- ❌ Run concurrent requests that would get everyone blocked
-- ❌ Abuse the API and get it shut down
-
-By compiling the code, we ensure **fair usage for everyone** while keeping it **free**.
-
-### ✅ This Is NOT Malware
-
-| What Goblin Does | What Goblin Does NOT Do |
-|------------------|------------------------|
-| ✅ Generates images via public API | ❌ Access your files |
-| ✅ Downloads AI models for upscaling | ❌ Send personal data anywhere |
-| ✅ Caches for faster generation | ❌ Install anything outside its folder |
-| ✅ Runs offline after setup | ❌ Require accounts or signups |
-
-### 🔓 Open Source Commitment
-
-- The API (`__init__.py`) is readable Python
-- All dependencies are standard PyPI packages
-- Built with [Nuitka](https://nuitka.net/) (legitimate Python compiler)
-
-*Still concerned? Run it in a sandbox or VM first.*
-
-</details>
-
----
-
-<div align="center">
-
-## 💜 Made for Artists, by Artists
-
-**Star ⭐ this repo if Goblin helped you create something awesome!**
-
-<br>
-
-[![GitHub stars](https://img.shields.io/github/stars/Itachi-1824/goblin-ai?style=social)](https://github.com/Itachi-1824/goblin-ai)
-
-<br>
-
-*© 2026 [Itachi-1824](https://github.com/Itachi-1824) • [PyPI](https://pypi.org/project/goblin-ai/) • [GitHub](https://github.com/Itachi-1824/goblin-ai)*
-
-</div>
+Report a minimal example with Goblin/Python versions, OS and chosen extra in the [issue tracker](https://github.com/Itachi-1824/goblin-ai/issues). Keep credentials and session cache contents out of public reports. Goblin uses a [proprietary license](https://github.com/Itachi-1824/goblin-ai/blob/main/LICENSE); downloaded models retain their [separate author licenses](https://github.com/Itachi-1824/goblin-ai/blob/main/MODEL_LICENSES.md).
