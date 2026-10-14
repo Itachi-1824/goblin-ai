@@ -33,9 +33,10 @@
         </div>
         <details class="disclosure"><summary>Things to avoid <span class="optional">Optional</span></summary><div class="disclosure-body"><label for="negativePrompt">Additional negative prompt</label><textarea id="negativePrompt" maxlength="4000" rows="2" placeholder="For example: blurry, text, watermark"></textarea><p class="hint">Adds exclusions alongside the model's defaults.</p></div></details>
         <div class="field">
-          <label for="model">Image model</label>
-          <div class="model-picker"><label class="sr-only" for="modelSearch">Find a model</label><input id="modelSearch" type="search" placeholder="Find a model or category" autocomplete="off"><select id="model" aria-describedby="modelHelp"><option value="">Loading models…</option></select></div>
-          <p id="modelHelp" class="hint">Choose a model for the subject and style you have in mind.</p>
+          <label id="modelLabelTitle" for="modelTrigger">Image model</label>
+          <label class="sr-only" for="model">Selected image model</label><select id="model" hidden><option value="auto">Auto</option></select>
+          <button id="modelTrigger" type="button" class="model-trigger" aria-haspopup="dialog" aria-controls="modelChooser" aria-describedby="modelHelp"><span id="modelLabel">Auto — match my prompt</span><span aria-hidden="true">⌄</span></button>
+          <p id="modelHelp" class="hint" aria-live="polite">Auto matches your prompt to a model. You can also choose one yourself.</p>
         </div>
         <div class="field">
           <div class="label-row"><span id="resolutionLabel" class="label">Canvas</span><label class="checkbox-label" for="customToggle"><input type="checkbox" id="customToggle">Custom size</label></div>
@@ -47,6 +48,7 @@
           </div>
           <p id="dimError" class="field-error" role="alert"></p>
           <p id="resolutionSummary" class="hint">768 × 768</p>
+          <div id="customProcessing" class="custom-processing" hidden><label for="processingPreset">Custom-size processing</label><select id="processingPreset"></select><p class="hint">Auto balances quality and hardware. Neural options may need a one-time download. Changes during generation apply to your next image.</p></div>
         </div>
         <div class="field-row">
           <div class="field"><label for="style">Style</label><select id="style"><option value="">Model default</option></select></div>
@@ -60,7 +62,6 @@
             <div class="field"><label for="expression">Expression</label><select id="expression"><option value="">Model default</option></select></div>
             <div class="field"><div class="label-row"><label for="seed">Seed</label><button type="button" id="randomSeed" class="text-button" aria-label="Choose a random seed">Shuffle</button></div><input id="seed" type="number" min="-1" max="2147483647" step="1" value="-1" aria-describedby="seedHelp"><p id="seedHelp" class="hint">−1 is random. Zero is a valid seed.</p></div>
             <div class="field"><label for="guidance">Guidance</label><input id="guidance" type="number" min="1" max="30" step="0.1" placeholder="Model default" aria-describedby="guidanceHelp"><p id="guidanceHelp" class="hint">Leave empty to use the model default.</p></div>
-            <div class="field full-width"><label for="processingPreset">Custom-size processing</label><select id="processingPreset"></select><p class="hint">Applies when you request custom dimensions. Neural presets may need a one-time model download.</p></div>
             <label class="checkbox-label full-width" for="removeBg"><input id="removeBg" type="checkbox">Remove background</label>
           </div>
         </details>
@@ -98,6 +99,12 @@
   </section>
 </main>
 <footer class="footer"><span>GOBLIN <span class="muted">· Image studio</span></span><a href="/docs" target="_blank" rel="noopener">API reference ↗</a></footer>
+<dialog id="modelChooser" class="model-chooser" aria-labelledby="modelChooserTitle">
+  <div class="dialog-header"><div><p class="eyebrow">FIND YOUR FIT</p><h2 id="modelChooserTitle">Choose an image model</h2></div><button id="modelChooserClose" class="icon-button" type="button" aria-label="Close model menu">×</button></div>
+  <label class="sr-only" for="modelSearch">Find a model</label><input id="modelSearch" type="search" placeholder="Search models or categories…" autocomplete="off" aria-describedby="modelMatches">
+  <p id="modelMatches" class="hint" role="status"></p>
+  <div id="modelChoices" class="model-choices"></div>
+</dialog>
 <dialog id="imageDialog" class="image-dialog" aria-labelledby="dialogTitle">
   <div class="dialog-header"><div><p class="eyebrow">THIS SESSION</p><h2 id="dialogTitle">Image preview</h2></div><button id="lightboxClose" class="icon-button" type="button" aria-label="Close image preview">×</button></div>
   <div class="lightbox-stage"><button id="lightboxPrev" class="image-nav previous" type="button" aria-label="Previous image">‹</button><img id="lightboxImg" alt="Selected gallery image"><button id="lightboxNext" class="image-nav next" type="button" aria-label="Next image">›</button></div>

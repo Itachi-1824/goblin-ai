@@ -105,6 +105,8 @@ goblin ui --port 8000
 goblin --port 8000
 ```
 
+The UI starts with **Auto** model routing from your prompt. Open the model menu to search models and categories. **Custom size** reveals dimensions and processing together; you can change the next image's settings while generation runs. See the [UI guide](https://github.com/Itachi-1824/goblin-ai/blob/main/docs/server.md#use-the-browser-ui).
+
 The legacy flag-only CLI remains supported. The server binds to localhost by default. `/health` reports initialization and readiness; generation returns HTTP 503 while initialization is incomplete, has failed, or the managed session is unavailable. Generation and upscaling requests have resource and per-client request limits. Use an authenticated reverse proxy when exposing the service publicly.
 
 ```sh

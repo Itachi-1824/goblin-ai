@@ -16,7 +16,9 @@ For a container, explicitly pass `--host 0.0.0.0`. Use an authenticated reverse 
 
 ## Use the browser UI
 
-Enter a prompt, choose an image model and a canvas shape, then generate when the server reports Online. Enable **Custom size** to set width and height from 64 to 4096 pixels. The preview canvas changes immediately as you edit valid dimensions; the size shown describes the next output. **Custom-size processing** chooses how the generated image reaches that size. After generation, choose an upscaling preset and use **Upscale 2×** to enlarge the result within the 4096-pixel limit.
+Enter a prompt and choose a canvas shape, then generate when the server reports Online. **Auto** is the default image model: it uses Goblin's local prompt mapping to choose a matching catalog model, and displays the recommendation below the picker. Open the image-model menu to search by name or category and choose a model manually. Filtering never changes the current selection. Auto routes the model; your canvas, negative prompt and other explicit settings remain yours.
+
+Enable **Custom size** to set width and height from 64 to 4096 pixels. The preview canvas changes immediately as you edit valid dimensions; the size shown describes the next output. **Custom-size processing** appears directly beside the dimensions and chooses how the generated image reaches that size. You can edit settings while an image is generating; changes apply to the next image. After generation, choose an upscaling preset and use **Upscale 2×** to enlarge the result within the 4096-pixel limit.
 
 Neural presets remain selectable before their weights are cached. Choosing one opens a setup dialog showing the required models and download sizes. Confirm **Download models** to prepare those weights once; presets sharing them reuse the cache. If a neural backend is missing, copy either `python -m pip install "goblin-ai[cpu]"` or `python -m pip install "goblin-ai[gpu]"`, run it in Goblin's environment, then restart Goblin and reload the page. Choose one backend; CUDA also needs a suitable NVIDIA driver. **Use fast resize** continues without a neural backend or model download. Closing setup restores the previous selection.
 
@@ -67,6 +69,8 @@ The JSON body supports `prompt`, `negative_prompt`, `model`, `shape`, `seed`, `g
 
 `POST /generate/base64` accepts the same body and returns JSON containing `image_base64`, `format`, `model`, `prompt`, `style`, `quality`, `width` and `height`. Base64 strings have no data-URL prefix. Raw responses report the actual image type in `Content-Type`.
 
+Set `model` to `"auto"` for prompt-based model routing. `POST /models/route` with a JSON body such as `{"prompt":"a watercolor mountain landscape"}` previews the same routing without generating an image or acquiring a provider session. Its `model` field identifies the selected catalog model. Manual model IDs remain supported. The router is a local prompt matcher; it cannot guarantee one model will produce the best image for every prompt.
+
 Convenience generation routes use **query parameters**, rather than a JSON request body. For example:
 
 ```sh
@@ -112,6 +116,7 @@ For one-time model setup, inspect `GET /upscale/models`, then call `POST /upscal
 | GET | `/session` | Get Session Config |
 | GET | `/device` | Device Info |
 | GET | `/models` | Get Models |
+| POST | `/models/route` | Route Model |
 | GET | `/models/{model_id}` | Get Model Info |
 | GET | `/models/{model_id}/styles` | Get Styles For Model |
 | GET | `/options` | Get All Options |
