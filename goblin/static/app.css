@@ -53,7 +53,8 @@ input[type=checkbox]{width:16px;min-height:16px;height:16px;flex:none;accent-col
 .field-help{display:flex;justify-content:space-between;gap:10px;font-size:10px;color:var(--muted);margin-top:7px}
 #promptCount{white-space:nowrap;font-variant-numeric:tabular-nums}
 .hint{font-size:11px;color:var(--muted);margin:7px 0 0;line-height:1.6;overflow-wrap:anywhere}
-.model-picker{display:grid;gap:7px}
+.model-trigger{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;min-height:44px;border:1px solid var(--border);border-radius:8px;background:var(--field);color:var(--text);padding:10px 12px;text-align:left;font-size:13px}
+.model-trigger:hover{border-color:#535865}.model-trigger>span:last-child{color:var(--gold);font-size:18px}.custom-processing{margin-top:14px}
 .field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;min-width:0}
 .field-row>.field{margin-bottom:17px}
 .shape-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
@@ -138,6 +139,12 @@ dialog::backdrop{background:#07080bdb;backdrop-filter:blur(6px)}
 .lightbox-prompt{font-size:12px;line-height:1.7;max-height:100px;overflow:auto;overflow-wrap:anywhere;margin:0}
 .dialog-help{color:var(--muted);font-size:10px;margin:14px 0 0}
 .model-dialog{width:min(560px,calc(100vw - 32px))}
+.model-chooser{width:min(520px,calc(100vw - 24px));max-height:calc(100dvh - 24px);overflow:hidden}
+.model-choices{max-height:calc(100dvh - 250px);min-height:100px;overflow:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#6d6041 transparent;margin:14px -8px -8px;padding:0 8px 8px;display:grid;gap:5px}
+.model-choices h3{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:17px 4px 5px}
+.model-choices button{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;min-height:46px;padding:10px 12px;border:1px solid transparent;border-radius:8px;background:var(--field);color:var(--text);text-align:left;font-size:13px}
+.model-choices button:hover{border-color:#535865;background:#232730}.model-choices button[aria-current=true]{border-color:#d7b66a66;background:#d7b66a12;color:var(--gold)}
+.model-choices button small{color:var(--muted);font-size:11px;flex:none}.model-choices p{font-size:12px;color:var(--muted);padding:14px 4px}#modelMatches{font-size:12px}
 .model-downloads{margin:14px 0;display:grid;gap:8px}
 .model-downloads>div,.model-downloads>p{padding:10px 12px;border:1px solid var(--border);border-radius:8px;background:var(--field);font-size:12px;margin:0}
 .runtime-help{border-top:1px solid var(--border);padding-top:16px;margin-top:18px}

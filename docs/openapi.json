@@ -3,7 +3,7 @@
   "info": {
     "title": "Goblin Image API",
     "description": "Free AI image generation with 50+ models, prompt enhancement, and random prompt generator",
-    "version": "2.1.2"
+    "version": "2.1.3"
   },
   "paths": {
     "/": {
@@ -97,6 +97,42 @@
             "content": {
               "application/json": {
                 "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/models/route": {
+      "post": {
+        "summary": "Route Model",
+        "operationId": "route_model_models_route_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ModelRouteRequestModel"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
               }
             }
           }
@@ -1412,6 +1448,22 @@
           "confirm"
         ],
         "title": "ModelDownloadRequestModel"
+      },
+      "ModelRouteRequestModel": {
+        "properties": {
+          "prompt": {
+            "type": "string",
+            "maxLength": 4000,
+            "minLength": 1,
+            "title": "Prompt",
+            "description": "Text description"
+          }
+        },
+        "type": "object",
+        "required": [
+          "prompt"
+        ],
+        "title": "ModelRouteRequestModel"
       },
       "UltraUpscaleRequestModel": {
         "properties": {
