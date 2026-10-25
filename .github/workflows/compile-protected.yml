@@ -84,6 +84,7 @@ jobs:
               'tests/conftest.py', 'tests/test_upscaler.py', 'tests/test_runtime.py',
               'tests/test_release.py', 'tests/test_privacy.py', 'tests/test_key_acquisition.py',
               'tests/test_image_boundaries.py', 'tests/test_documentation.py',
+              'tests/test_guard_startup.py',
               'release/setup.py', 'release/README.md', 'release/pyproject.toml',
               'release/MODEL_LICENSES.md', 'release/MANIFEST.in', 'release/LICENSE',
               'release/docs/upscaling.md', 'release/docs/troubleshooting.md',
