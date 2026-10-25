@@ -37,13 +37,17 @@ The base install includes generation, prompt tools, PNG enhancement, interpolati
 
 ```sh
 pip install "goblin-ai[cpu]"
-# Or, in a separate environment for NVIDIA CUDA:
+# Or choose one accelerated backend in a separate environment:
 pip install "goblin-ai[gpu]"
+# AMD on Windows (DirectML):
+pip install "goblin-ai[amd]"
+# Apple on macOS (CoreML):
+pip install "goblin-ai[apple]"
 ```
 
 On Intel macOS with CPython 3.14, the base install works, but the CPU neural extra has no compatible ONNX Runtime wheel. Use CPython 3.13 for neural upscaling on Intel macOS, or use another supported platform.
 
-Choose CPU or GPU, rather than installing both runtimes in the same environment. The `quality`, `best` and `all` extras remain CPU aliases; they no longer install the old PyTorch/BasicSR stack. Models download on their first explicit use and are cached in the user's cache directory. `GOBLIN_MODEL_DIR` can select another writable cache directory.
+Choose one runtime per environment: `gpu` uses NVIDIA CUDA on Windows/Linux and CoreML on macOS; `amd` uses DirectML on Windows. AMD Linux additionally requires a compatible ROCm/MIGraphX installation; follow the [hardware setup guide](https://github.com/Itachi-1824/goblin-ai/blob/main/docs/upscaling.md#hardware-and-runtimes). The `apple` extra selects the macOS ONNX Runtime with CoreML support. The `quality`, `best` and `all` extras remain CPU aliases; they no longer install the old PyTorch/BasicSR stack. Models download on their first explicit use and are cached in the user's cache directory. `GOBLIN_MODEL_DIR` can select another writable cache directory.
 
 See [installation and first image](https://github.com/Itachi-1824/goblin-ai/blob/main/docs/getting-started.md) for environment setup and device verification.
 

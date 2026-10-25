@@ -1,6 +1,6 @@
 # Complete Python API reference
 
-Reference for Goblin 2.1.3. All 67 names in `goblin.__all__` are listed below. Import them from `goblin` unless a submodule is explicitly shown.
+Reference for Goblin 2.2.0. All 67 names in `goblin.__all__` are listed below. Import them from `goblin` unless a submodule is explicitly shown.
 
 Signatures describe the supported public interface. `Optional`, `Union` and `Callable` below use their normal Python typing meanings. Async functions must be awaited. See the guides for behavior, errors and compatibility fields.
 
@@ -620,7 +620,7 @@ Return whether the installed runtime advertises an accelerated provider; this do
 goblin.get_device_info() -> dict
 ```
 
-Return provider, provider_id, gpu_available, ram_gb, tile_size, recommended_preset and all_providers.
+Return provider, provider_id, gpu_available, ram_gb, tile_size, recommended_preset, all_providers, device_preference and loaded_providers. The selected provider is an availability preference; loaded_providers maps initialized model names to their session providers, including CPU fallback. Neither list proves per-operator acceleration. See [hardware setup](upscaling.md#hardware-and-runtimes) for AMD, Apple and NVIDIA runtimes.
 
 ### `UPSCALE_PRESETS`
 

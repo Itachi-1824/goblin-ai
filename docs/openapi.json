@@ -3,7 +3,7 @@
   "info": {
     "title": "Goblin Image API",
     "description": "Free AI image generation with 50+ models, prompt enhancement, and random prompt generator",
-    "version": "2.1.3"
+    "version": "2.2.0"
   },
   "paths": {
     "/": {

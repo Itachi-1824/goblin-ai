@@ -49,6 +49,24 @@ Processing and model downloads are synchronous. In an async application, use `aw
 
 `enhance(data, ...)` produces PNG, preserves an image without neural inference when it does not need enlargement, and uses fast resizing when no backend is installed. `upscale_ultra()` offers an explicit restoration/upscale pipeline and PNG or JPEG encoding; restoration is opt-in and legacy restoration weights should be evaluated separately before production use. Output dimensions are exact even if the neural model's native scale differs from the requested scale.
 
+## Hardware and runtimes
+
+All neural upscaling and restoration use the same ONNX Runtime session loader. Fast resizing, sharpening, image decoding/encoding and alpha processing use CPU libraries on all supported platforms; they do not require NVIDIA. Generation runs upstream and does not use your local GPU.
+
+| Hardware | Install in a fresh environment | Selected provider |
+|---|---|---|
+| CPU, any supported OS | `python -m pip install "goblin-ai[cpu]"` | CPU |
+| NVIDIA, Windows/Linux | `python -m pip install "goblin-ai[gpu]"` | CUDA |
+| AMD/Intel/other DirectX 12 GPU, Windows | `python -m pip install "goblin-ai[amd]"` | DirectML |
+| Apple, macOS | `python -m pip install "goblin-ai[apple]"` | CoreML when included in the installed runtime |
+| AMD, supported Linux/ROCm combination | `python -m pip install "goblin-ai[amd]"`, then install matching AMD runtime/plugin packages | MIGraphX; legacy ROCm builds remain recognized |
+
+Install one ONNX Runtime distribution per environment. DirectML requires Windows 10 1903 or later, DirectX 12 hardware and a compatible driver. It remains supported in sustained engineering; Goblin uses its Python wheel for compatibility with the existing Python SDK. Sessions disable memory-pattern optimization and use sequential execution as required by [ONNX Runtime's DirectML documentation](https://onnxruntime.ai/docs/execution-providers/DirectML-ExecutionProvider.html).
+
+On macOS, standard ONNX Runtime wheels include CoreML when built with that provider. Goblin enables all compatible CoreML compute units; on macOS 12+ it requests MLProgram format, while earlier supported runtimes keep the older model format. CoreML decides placement across CPU, GPU and Neural Engine; not every model or operator can use the accelerator. Runtime wheel availability can impose newer macOS requirements. See [CoreML options](https://onnxruntime.ai/docs/execution-providers/CoreML-ExecutionProvider.html).
+
+For AMD Linux, follow [AMD's ONNX Runtime installation guide](https://rocm.docs.amd.com/projects/ai-ecosystem/en/latest/inference/onnxruntime.html), selecting your ROCm release, GPU, OS and Python version. The `amd` extra alone installs the base runtime on Linux; it does not install ROCm or the MIGraphX plugin. Current plugin installations require AMD's package index and matching MIGraphX packages, so Goblin does not hard-code a wheel URL or install drivers. Goblin registers an installed `onnxruntime_ep_migraphx` plugin once, and also recognizes older runtimes with a built-in MIGraphX provider. The old ROCm provider is recognized for existing environments but is [removed from ONNX Runtime 1.23 onward](https://onnxruntime.ai/docs/execution-providers/ROCm-ExecutionProvider.html); use MIGraphX for new setups. Keep older bundled `onnxruntime-migraphx` wheels separate from the plain `onnxruntime` distribution.
+
 ## Device selection and caching
 
 ```python
@@ -60,7 +78,7 @@ print(is_gpu_available())
 print(get_device_info())
 ```
 
-`gpu` requires an accelerated provider and raises if inference falls back to CPU. `auto` can fall back to CPU when accelerator initialization fails. Provider availability alone is not proof that inference will run on the GPU; initialize a model and verify actual execution when deploying.
+`gpu` requires an accelerated session provider and raises if initialization falls back entirely to CPU. Unsupported operators can still execute on CPU, including with CoreML. `auto` can fall back to CPU when accelerator initialization fails. `get_device_info()` and `GET /device` report available/selected providers and `loaded_providers` for already initialized models; these lists do not prove per-operator GPU execution. Initialize a model, run inference and profile execution when qualifying a deployment. Hardware and driver testing is still required for each supported target; the NVIDIA timings below are not AMD or Apple benchmarks.
 
 Models download on first use and are cached outside the installed package, so read-only installations work. Set `GOBLIN_MODEL_DIR` before importing Goblin to choose a writable location. `download_model()` prefetches a model; `delete_model()` deletes its cached file and returns whether a file was removed. First download and session initialization are additional to warm processing times.
 
