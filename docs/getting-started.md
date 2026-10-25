@@ -20,12 +20,14 @@ The base install provides generation, prompt tools, the HTTP server/UI, PNG outp
 |---|---|
 | `pip install goblin-ai` | Generation and fast resizing |
 | `pip install "goblin-ai[cpu]"` | Neural upscaling on CPU |
-| `pip install "goblin-ai[gpu]"` | NVIDIA CUDA neural upscaling |
+| `pip install "goblin-ai[gpu]"` | NVIDIA CUDA on Windows/Linux; CoreML on macOS |
+| `pip install "goblin-ai[amd]"` | AMD/DirectML on Windows; Linux requires additional ROCm/MIGraphX setup |
+| `pip install "goblin-ai[apple]"` | Apple CoreML on macOS |
 | `quality`, `best`, `all` extras | Compatibility aliases for the CPU backend |
 
 On Intel macOS with CPython 3.14, the base install works, but the CPU neural extra has no compatible ONNX Runtime wheel. Use CPython 3.13 for neural upscaling on Intel macOS, or use another supported platform.
 
-Choose CPU or GPU in a separate environment. Both packages provide the same `onnxruntime` module; installing both can create an ambiguous backend. The GPU extra includes runtime dependencies, but an appropriate NVIDIA driver is also required. Verify actual selection with `get_device_info()` and an inference run; advertised providers alone do not prove a working driver.
+Choose one runtime in a separate environment. CPU, CUDA, DirectML and older bundled AMD runtime wheels provide the same `onnxruntime` module; installing competing distributions together can create an ambiguous backend. The CUDA extra includes runtime dependencies, but an appropriate NVIDIA driver is also required. The Apple extra uses the standard macOS wheel; no CUDA installation is needed. AMD Linux needs the vendor's compatible ROCm/MIGraphX packages after installing Goblin. See [hardware and runtimes](upscaling.md#hardware-and-runtimes). Verify actual selection with `get_device_info()` and an inference run; advertised providers alone do not prove a working driver.
 
 Save your first image:
 
@@ -63,7 +65,7 @@ To use the browser interface instead of writing a script:
 goblin ui --port 8000
 ```
 
-Wait for Online, enter a prompt and choose a model. Custom dimensions update the canvas immediately. Neural processing presets offer a confirmation dialog for one-time weight downloads; if the backend is missing, the dialog provides CPU/CUDA install commands to run in this same environment before restarting Goblin. Fast resize works with the base install. Browse generated images using gallery arrows, the mouse wheel or touch swipes. Download anything you want to keep: the session gallery clears on refresh and retains at most 24 results within its base64-data limit. Stop waiting ends the browser wait; server work may continue. See [UI and server usage](server.md) for limits and setup details.
+Wait for Online, enter a prompt and choose a model. Custom dimensions update the canvas immediately. Neural processing presets offer a confirmation dialog for one-time weight downloads; if the backend is missing, the dialog provides CPU, NVIDIA, AMD and Apple install commands to run in this same environment before restarting Goblin. Fast resize works with the base install. Browse generated images using gallery arrows, the mouse wheel or touch swipes. Download anything you want to keep: the session gallery clears on refresh and retains at most 24 results within its base64-data limit. Stop waiting ends the browser wait; server work may continue. See [UI and server usage](server.md) for limits and setup details.
 
 Check the installed version and available local processing:
 

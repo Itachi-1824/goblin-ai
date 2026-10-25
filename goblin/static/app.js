@@ -241,7 +241,7 @@ if (typeof document === 'undefined') {
       }
       select.value = [...select.options].some(option => option.value === previous && !option.disabled) ? previous : 'auto';
     }
-    text('deviceInfo', `${device.provider || 'Unknown device'} · ${device.ram_gb ?? '?'} GB RAM${device.all_providers.length ? '' : ' · Neural backend unavailable; resize only'}`);
+    text('deviceInfo', `Available: ${device.provider || 'Unknown device'} · ${device.ram_gb ?? '?'} GB RAM${device.all_providers.length ? '' : ' · Neural backend unavailable; resize only'}`);
     text('presetHelp', 'Generation Auto considers quality and hardware. Result Auto considers hardware. Off still resizes.');
     state.device = true;
     state.hardware = device;
@@ -674,7 +674,7 @@ if (typeof document === 'undefined') {
   $('installConfirm').addEventListener('click', installModels);
   $('installCancel').addEventListener('click', () => cancelSetup());
   $('modelSetupFallback').addEventListener('click', () => cancelSetup(true));
-  for (const [id, extra] of [['copyCpuInstall', 'cpu'], ['copyGpuInstall', 'gpu']]) $(id).addEventListener('click', async () => {
+  for (const [id, extra] of [['copyCpuInstall', 'cpu'], ['copyGpuInstall', 'gpu'], ['copyAmdInstall', 'amd'], ['copyAppleInstall', 'apple']]) $(id).addEventListener('click', async () => {
     const command = `python -m pip install "goblin-ai[${extra}]"`;
     try { await navigator.clipboard.writeText(command); text('modelSetupStatus', `Copied: ${command}`); } catch (error) { text('modelSetupError', `Clipboard unavailable. Copy this command manually: ${command}`); }
   });

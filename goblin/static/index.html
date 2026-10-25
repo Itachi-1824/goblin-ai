@@ -114,7 +114,14 @@
 <dialog id="modelDialog" class="model-dialog" aria-labelledby="modelSetupTitle">
   <div class="dialog-header"><div><p class="eyebrow">ONE-TIME SETUP</p><h2 id="modelSetupTitle">Prepare neural upscaling</h2></div><button id="installCancel" class="icon-button" type="button" aria-label="Cancel model setup">×</button></div>
   <p id="modelSetupInfo" class="hint"></p><div id="modelDownloads" class="model-downloads"></div>
-  <div class="runtime-help"><h3>Need a neural runtime?</h3><p class="hint">Install one backend in Goblin's environment, then restart the UI. CPU works without a graphics card; CUDA needs a suitable NVIDIA driver.</p><div class="install-command"><code>python -m pip install "goblin-ai[cpu]"</code><button id="copyCpuInstall" class="text-button" type="button">Copy CPU command</button></div><div class="install-command"><code>python -m pip install "goblin-ai[gpu]"</code><button id="copyGpuInstall" class="text-button" type="button">Copy CUDA command</button></div></div>
+  <div class="runtime-help"><h3>Choose your processing hardware</h3>
+    <p class="hint">Install one runtime in Goblin's environment, then restart the UI. Choose CPU, NVIDIA CUDA, AMD or Apple. Drivers and model support determine acceleration.</p>
+    <div class="install-command"><code>python -m pip install "goblin-ai[cpu]"</code><button id="copyCpuInstall" class="text-button" type="button">Copy CPU command</button></div>
+    <div class="install-command"><code>python -m pip install "goblin-ai[gpu]"</code><button id="copyGpuInstall" class="text-button" type="button">Copy NVIDIA command</button></div>
+    <div class="install-command"><code>python -m pip install "goblin-ai[amd]"</code><button id="copyAmdInstall" class="text-button" type="button">Copy AMD command</button></div>
+    <div class="install-command"><code>python -m pip install "goblin-ai[apple]"</code><button id="copyAppleInstall" class="text-button" type="button">Copy Apple command</button></div>
+    <p class="hint">AMD uses DirectML on Windows. Linux also needs a matching <a href="https://rocm.docs.amd.com/projects/ai-ecosystem/en/latest/inference/onnxruntime.html" target="_blank" rel="noopener noreferrer">ROCm/MIGraphX installation</a>. Apple acceleration requires macOS.</p>
+  </div>
   <p id="modelSetupStatus" class="operation-status" role="status"></p><p id="modelSetupError" class="operation-error" role="alert"></p>
   <div class="model-dialog-actions"><button id="installConfirm" class="primary-button" type="button">Download model</button><button id="modelSetupFallback" class="secondary-button" type="button">Use fast resize</button></div>
 </dialog>
