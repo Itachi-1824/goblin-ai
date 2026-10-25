@@ -70,6 +70,10 @@ jobs:
           GOBLIN_BUILD_CHUNK_10: ${{ secrets.GOBLIN_BUILD_CHUNK_10 }}
           GOBLIN_BUILD_CHUNK_11: ${{ secrets.GOBLIN_BUILD_CHUNK_11 }}
           GOBLIN_BUILD_CHUNK_12: ${{ secrets.GOBLIN_BUILD_CHUNK_12 }}
+          GOBLIN_BUILD_CHUNK_13: ${{ secrets.GOBLIN_BUILD_CHUNK_13 }}
+          GOBLIN_BUILD_CHUNK_14: ${{ secrets.GOBLIN_BUILD_CHUNK_14 }}
+          GOBLIN_BUILD_CHUNK_15: ${{ secrets.GOBLIN_BUILD_CHUNK_15 }}
+          GOBLIN_BUILD_CHUNK_16: ${{ secrets.GOBLIN_BUILD_CHUNK_16 }}
         run: |
           python - <<'PY'
           import base64, hashlib, io, json, os, re, shutil, stat, subprocess, sys, tempfile, zipfile
@@ -99,7 +103,7 @@ jobs:
               source_sha = os.environ['GOBLIN_BUILD_SOURCE_SHA']
               if not re.fullmatch(r'[0-9a-f]{40}', source_sha):
                   raise ValueError()
-              chunks = [os.environ.get(f'GOBLIN_BUILD_CHUNK_{i:02}', '') for i in range(1, 13)]
+              chunks = [os.environ.get(f'GOBLIN_BUILD_CHUNK_{i:02}', '') for i in range(1, 17)]
               if any(len(chunk) > 24000 for chunk in chunks):
                   raise ValueError()
               key = base64.b64decode(os.environ['GOBLIN_BUILD_KEY'], validate=True)
