@@ -7,6 +7,7 @@
 [![PyPI version](https://img.shields.io/pypi/v/goblin-ai?color=blue&label=PyPI)](https://pypi.org/project/goblin-ai/)
 [![Python](https://img.shields.io/pypi/pyversions/goblin-ai?color=green)](https://pypi.org/project/goblin-ai/)
 [![Downloads](https://img.shields.io/pypi/dm/goblin-ai?color=orange)](https://pypi.org/project/goblin-ai/)
+[![Verified on FreeAPI](https://findfreeapi.com/api/badge/goblin-ai)](https://findfreeapi.com/en/service/goblin-ai)
 [![License](https://img.shields.io/badge/license-Proprietary-red)](https://github.com/Itachi-1824/goblin-ai/blob/main/LICENSE)
 
 <br>
